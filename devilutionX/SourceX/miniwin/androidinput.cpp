@@ -16,25 +16,53 @@ namespace dvl {
 	 SDL_Surface * ShiftStickS;
 	 SDL_Texture * ShiftStickT;
 
+	 SDL_Surface * DemoSqS;
+	 SDL_Texture * DemoSqT;
+
 	 SDL_Surface * Fog  = NULL;
 	 SDL_Texture * gFog = NULL;
 
 
 coords speedspellscoords[50];
 bool ShiftButtonPressed = 0;
+bool DemoModeEnabled=0;
+
+ 
+ 
+ 
+SDL_Rect PotGameUIMenu ={195,350,245,50};
+SDL_Rect RGameUIMenu={555,350,85,130};
+SDL_Rect LGameUIMenu={0,350,85,130};
+SDL_Rect Arect={520,250,110,105};
+SDL_Rect Crect={565,180,60,60}; 
+SDL_Rect Shiftrect={68,257,58,52};
 
 
- SDL_Rect Shiftrect;
- SDL_Rect LGameUIMenu;
- SDL_Rect RGameUIMenu;
- SDL_Rect PotGameUIMenu;
- SDL_Rect Crect;
+
+SDL_Rect DemoN ={68,202,58,52}; 
+SDL_Rect DemoE ={140,257,58,52};   
+SDL_Rect DemoW ={0,257,58,52};		
+SDL_Rect DemoS ={68,315,58,52};  
+
+
+SDL_Rect DemoNW={0,204,58,52};
+SDL_Rect DemoNE={140,204,58,52};	
+SDL_Rect DemoSW={0,315,58,52};
+SDL_Rect DemoSE={140,315,58,52};
+
+
+SDL_Rect DemonHealth={100,350,85,130};
+SDL_Rect AngelMana={460,350,85,130};
+
+
 
 bool AttackButtonPressed;
 bool CastButtonPressed;
 bool gbAndroidInterfaceLoaded = 0;	   
 bool showJoystick = true;
 bool newCurHidden = false;
+
+bool DemoMode = false;
 //			SDL_BlitSurface(surface, &source_rect, temp_surface, NULL);
             // Figure out transparency.
            
@@ -57,15 +85,17 @@ bool newCurHidden = false;
 	 SDL_SetTextureAlphaMod(ShiftStickT, 255);
 
 
-
-
-
 	 //Loading Walking Joystick.
 	 JoyStickS = IMG_Load("/sdcard/Devilution/dpad.png");
      JoyStickT = SDL_CreateTextureFromSurface(renderer, JoyStickS);
 	 SDL_SetTextureBlendMode(JoyStickT, SDL_BLENDMODE_BLEND);
 	 SDL_SetTextureAlphaMod(JoyStickT, 255);
 
+
+	DemoSqS = IMG_Load("/sdcard/Devilution/demosq.png");
+	DemoSqT = SDL_CreateTextureFromSurface(renderer, DemoSqS);
+	SDL_SetTextureBlendMode(DemoSqT, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureAlphaMod(DemoSqT, 255);
 
 
 
@@ -94,10 +124,29 @@ void DrawJoyStick(int MouseX, int MouseY, bool flag){
          Jrect.h = 170;
          Jrect.w = 190; 
 
+		 //TX 181, TY 309 MX 181 MY 309
 	SDL_RenderCopy(renderer, JoyStickT, NULL, &Jrect);
+	if(DemoModeEnabled){
+	
+	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoE);
+	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoW); 
+	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoS);
+	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoN); 
 
+	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoNE);
+	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoNW);
+	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoSE);
+	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoSW);
 
+	SDL_RenderCopy(renderer, DemoSqT, NULL, &LGameUIMenu);
+	SDL_RenderCopy(renderer, DemoSqT, NULL, &RGameUIMenu);
+	SDL_RenderCopy(renderer, DemoSqT, NULL, &PotGameUIMenu);
 
+	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemonHealth);
+	SDL_RenderCopy(renderer, DemoSqT, NULL, &AngelMana);
+	}
+
+//LGameUIMenu
 
 }
 
@@ -145,6 +194,7 @@ void __fastcall checkTownersNearby(bool interact)
 				continue;
 			pcursmonst = i;
 			if (interact) {
+				plr[myplr].destAction = ACTION_NONE;
 				TalkToTowner(myplr, i);
 			}
 			break;
@@ -154,44 +204,6 @@ void __fastcall checkTownersNearby(bool interact)
 
 
 void DrawAndroidUI(){
-
-		 SDL_Rect Arect;
-         Arect.x = 640 - 120;
-         Arect.y = 250;
-         Arect.h = 100;
-         Arect.w = 110; //SDL_BlitSurface(AJoyStickS, &zrect, surface, NULL);
-
-		 
-         Crect.x = 640 - 75;
-         Crect.y = 200;
-         Crect.h = 50;
-         Crect.w = 50; //SDL_BlitSurface(AJoyStickS, &zrect, surface, NULL);
-
-		
-         Shiftrect.x = 70;
-         Shiftrect.y = 260;
-         Shiftrect.h = 50;
-         Shiftrect.w = 50; //SDL_BlitSurface(AJoyStickS, &zrect, surface, NULL);
-
-		 LGameUIMenu.x = 0; // I want this to be dynamic // 555 // 100
-         LGameUIMenu.y = 350;
-         LGameUIMenu.h = 150;
-         LGameUIMenu.w = 85; // accept click until for left side of pmenu.
-
-		 RGameUIMenu.x = 555; // I want this to be dynamic // 555 // 100
-         RGameUIMenu.y = 350;
-         RGameUIMenu.h = 150;
-         RGameUIMenu.w = 100; // accept click until for left side of pmenu.
-
-		 	 
-		 PotGameUIMenu.x = 195; // I want this to be dynamic // 555 // 100
-         PotGameUIMenu.y = 350;
-         PotGameUIMenu.h = 150;
-         PotGameUIMenu.w = 460; // accept click until for left side of pmenu.
-
-
-
-
 
 		//X 195 Y 355 MX 0 MY 350
 		//X 442 Y 383 MX 0 MY 350
@@ -221,6 +233,7 @@ void DrawAndroidUI(){
 			}
 			else{
 				SDL_RenderCopy(renderer, AJoyStickT, NULL, &Crect);
+				
 			}
 
 
@@ -234,6 +247,10 @@ void DrawAndroidUI(){
 		else{
 			SDL_SetTextureColorMod(ShiftStickT, 220,220,220);
 			SDL_RenderCopy(renderer, ShiftStickT, NULL, &Shiftrect);
+			if(DemoModeEnabled){
+				SDL_RenderCopy(renderer, DemoSqT, NULL, &Shiftrect);
+			}
+			
 		}
 	}	
 }
@@ -501,15 +518,19 @@ template<typename T> inline T CLIP(T v, T amin, T amax)
 
 int TouchX = 0;
 int TouchY = 0;
+#define DISPLAY_WIDTH 1920
+#define DISPLAY_HEIGHT 1080
+#define GAME_WIDTH 640
+#define GAME_HEIGHT 480
+
+
 void convert_touch_xy_to_game_xy(float touch_x, float touch_y, int *game_x, int *game_y) {
-	const int screen_h = 480;
-	const int screen_w = 640;
-	int disp_w = 0;
-	int disp_h = 0;
 
-	SDL_GetWindowSize(window,&disp_w,&disp_h);
+	const int screen_h = GAME_HEIGHT;
+	const int screen_w = GAME_WIDTH;
+	const int disp_w   = DISPLAY_WIDTH;
+	const int disp_h   = DISPLAY_HEIGHT;
 
-	
 	int x, y, w, h;
 	float sx, sy;
 
@@ -526,22 +547,16 @@ void convert_touch_xy_to_game_xy(float touch_x, float touch_y, int *game_x, int 
 	float disp_touch_x = (touch_x * (float) disp_w);
 	float disp_touch_y = (touch_y * (float) disp_h);
 
-	
-	*game_x = CLIP((int)((disp_touch_x - x) / sx), 0, (int) screen_w);
-	*game_y = CLIP((int)((disp_touch_y - y) / sy), 0, (int) screen_h);
+	*game_x = CLIP((int)((disp_touch_x - x) / sx), 0, (int) GAME_WIDTH);
+	*game_y = CLIP((int)((disp_touch_y - y) / sy), 0, (int) GAME_HEIGHT);
 
-	
+	int foox = *game_x;
+	int fooy = *game_y;
 	TouchX = *game_x;
 	TouchY = *game_y;
-
 	
-	
-	//SDL_Log("zzzzzzzz X %d AND Y %d \n",px,py );
-
-
-
+	//SDL_Log("GAME_X %d GAME_Y %d ", foox, fooy);
 }
-
 
 
 

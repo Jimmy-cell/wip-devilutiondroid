@@ -338,7 +338,7 @@ HWND CreateWindowExA(
 
 		char scaleQuality[2] = "2";
 		DvlStringSetting("scaling quality", scaleQuality, 2);
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, scaleQuality);
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, 0);
 	} else if (fullscreen) {
 		flags |= SDL_WINDOW_FULLSCREEN;
 	}
@@ -351,11 +351,11 @@ HWND CreateWindowExA(
 
 
 	#ifdef ANDROID
-	nWidth = 640;
-	nHeight = 480;
+	//nWidth = 1920;
+	//nHeight = 1080;
 	#endif
 
-	window = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, nWidth, nHeight, flags);
+	window = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, nWidth, nHeight, SDL_WINDOW_FULLSCREEN);
 	if (window == NULL) {
 		SDL_Log(SDL_GetError());
 	}
@@ -373,9 +373,14 @@ HWND CreateWindowExA(
 			SDL_Log(SDL_GetError());
 		}
 
-		if (SDL_RenderSetLogicalSize(renderer, nWidth, nHeight) <= -1) {
-			SDL_Log(SDL_GetError());
-		}
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear"); 
+		SDL_RenderSetLogicalSize(renderer, 640, 480);
+
+
+
+		// if (SDL_RenderSetLogicalSize(renderer, nWidth, nHeight) <= -1) {
+		// 	SDL_Log(SDL_GetError());
+		// }
 	}
 
 	return window;

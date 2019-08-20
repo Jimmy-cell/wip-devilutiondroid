@@ -1,12 +1,11 @@
-#include <deque>
-#include <SDL.h>
 #include "devilution.h"
 #include "stubs.h"
+#include <SDL.h>
+#include <deque>
 
 #ifdef ANDROID
 #include "miniwin/ddraw.h"
 #endif
-
 
 /** @file
  * *
@@ -14,7 +13,6 @@
  */
 
 namespace dvl {
-
 
 static std::deque<MSG> message_queue;
 
@@ -196,13 +194,11 @@ static WINBOOL false_avail()
 	return false;
 }
 
-
-
-	#ifdef ANDROID
-	int num_fingers_down = 0;
-	int Xbase = 0;
-	int Ybase = 0;
-	#endif
+#ifdef ANDROID
+int num_fingers_down = 0;
+int Xbase = 0;
+int Ybase = 0;
+#endif
 
 WINBOOL PeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg)
 {
@@ -212,92 +208,75 @@ WINBOOL PeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilter
 		UNIMPLEMENTED();
 	if (hWnd != NULL)
 		UNIMPLEMENTED();
-		SDL_Event e;
+	SDL_Event e;
 
-		#ifdef ANDROID
-		//TODO
-		// So this was my attempy to normalize these coordinates. Y seems to be fine. X on the other hand, is off .
-		// Going left to right it seems to be gradually off from -80 PX to +80 PX.
 
-	//	SDL_Log("I WAS CLICKED X %d,  Y %d \n", MouseX, MouseY);
-		SDL_RenderSetLogicalSize(renderer, 640 , 480);
 
-		if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT) && (!invflag && !spselflag && !chrflag && !stextflag && !questlog && !helpflag && !talkflag /* && !qtextflag*/ ) ) {
-    	//SDL_Log("Mouse Button 1 (left) is pressed.");
+#ifdef ANDROID
+	//SDL_Log("SDL EVENT TYPE %d", e.type);
 
-		SDL_GetMouseState(&MouseX, &MouseY);
-    	//SDL_Log("I WAS CLICKED MX %d,  MY %d \n", MouseX, MouseY);
-		if(MouseX < 600 && MouseY > 500 ){
-			showJoystick = true;
-		}
-		if (MouseX > 409 && MouseX < 551 && MouseY > 460 && MouseY < 535) {
+	SDL_RenderSetLogicalSize(renderer, 640, 480);
+
+	if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT) && (!invflag && !spselflag && !chrflag && !stextflag && !questlog && !helpflag && !talkflag)) 
+	{
+		SDL_Log("WALKING\n");
+
+		if (TouchX > DemoN.x && TouchX < DemoN.x + DemoN.w && TouchY > DemoN.y && TouchY < DemoN.y + DemoN.h) {
 			AutoPickGold(myplr);
 			AutoPickItem(myplr);
 			walkInDir(WALK_N);
-				}
-		if (MouseX > 545 && MouseX < 641 && MouseY > 561 && MouseY < 641) {
-						AutoPickGold(myplr);
-						AutoPickItem(myplr);
-						walkInDir(WALK_E);
-				}
-		if (MouseX > 245 && MouseX < 320 && MouseY > 612 && MouseY < 699) {
-						AutoPickGold(myplr);
-						AutoPickItem(myplr);
-						walkInDir(WALK_W);
-				}
-		if (MouseX > 376 && MouseX < 450 && MouseY > 680 && MouseY < 811) {
-						AutoPickGold(myplr);
-						AutoPickItem(myplr);
-						walkInDir(WALK_S);
+		}
+		if (TouchX > DemoE.x && TouchX < DemoE.x + DemoE.w && TouchY > DemoE.y && TouchY < DemoE.y + DemoE.h) {
+			AutoPickGold(myplr);
+			AutoPickItem(myplr);
+			walkInDir(WALK_E);
+		}
 
-				}
+		if (TouchX > DemoW.x && TouchX < DemoW.x + DemoW.w && TouchY > DemoW.y && TouchY < DemoW.y + DemoW.h) {
+			AutoPickGold(myplr);
+			AutoPickItem(myplr);
+			walkInDir(WALK_W);
+		}
 
-		if (MouseX > 542 && MouseX < 643 && MouseY > 462 && MouseY < 552) {
+		if (TouchX > DemoS.x && TouchX < DemoS.x + DemoS.w && TouchY > DemoS.y && TouchY < DemoS.y + DemoS.h) {
+			AutoPickGold(myplr);
+			AutoPickItem(myplr);
+			walkInDir(WALK_S);
+		}
+
+		if (TouchX > DemoNE.x && TouchX < DemoNE.x + DemoNE.w && TouchY > DemoNE.y && TouchY < DemoNE.y + DemoNE.h) {
 			AutoPickGold(myplr);
 			AutoPickItem(myplr);
 			walkInDir(WALK_NE);
 		}
-		if (MouseX > 213 && MouseX < 353 && MouseY > 430 && MouseY < 572) {
+
+		if (TouchX > DemoNW.x && TouchX < DemoNW.x + DemoNW.w && TouchY > DemoNW.y && MouseY < DemoNW.y + DemoNW.h) {
 			AutoPickGold(myplr);
 			AutoPickItem(myplr);
 			walkInDir(WALK_NW);
 		}
-		if (MouseX > 247 && MouseX < 353 && MouseY > 731 && MouseY < 800) {
+		if (TouchX > DemoSW.x && TouchX < DemoSW.x + DemoSW.w && TouchY > DemoSW.y && TouchY < DemoSW.y + DemoSW.h) {
 			AutoPickGold(myplr);
 			AutoPickItem(myplr);
 			walkInDir(WALK_SW);
 		}
-		if (MouseX > 518 && MouseX < 625 && MouseY > 716 && MouseY < 811) {
+		if (TouchX > DemoSE.x && TouchX < DemoSE.x + DemoSE.w && TouchY > DemoSE.y && TouchY < DemoSE.y + DemoSE.h) {
 			AutoPickGold(myplr);
 			AutoPickItem(myplr);
 			walkInDir(WALK_SE);
+			
 		}
-
-		}
-		//ATTACK BUTTON
-		//X 1465,  Y 613 
-		//X 1605,  Y 724
-		if (MouseX > 1465 && MouseX < 1605 && MouseY > 613 && MouseY < 724) {
-			AttackButtonPressed = true;
-
-			if (leveltype != DTYPE_TOWN){
-				if (checkMonstersNearby(true, false) == false){ // Appears to works well.
-					ActivateObject(true);
-
-				}
-			}
-			else{
-				checkTownersNearby(true);
-			}	
-		}
-
-
-
-
-
 
 		
- #endif
+	}
+
+
+	else{
+	SDL_Log("---Nothing\n");
+		
+	}
+
+#endif
 
 	if (wRemoveMsg == DVL_PM_NOREMOVE) {
 		// This does not actually fill out lpMsg, but this is ok
@@ -314,9 +293,23 @@ WINBOOL PeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilter
 		return true;
 	}
 
-	
 	if (!SDL_PollEvent(&e)) {
 		return false;
+	}
+
+	if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT) && (!invflag && !spselflag && !chrflag && !stextflag && !questlog && !helpflag && !talkflag /* && !qtextflag*/)) {
+
+
+		if (e.type == SDL_FINGERDOWN) {
+
+			int Xclick = e.tfinger.x * 640;
+			int Yclick = e.tfinger.y * 480;
+			SDL_GetMouseState(&MouseX, &MouseY);
+			convert_touch_xy_to_game_xy(e.tfinger.x, e.tfinger.y, &MouseX, &MouseY);
+			SDL_Log(" TX %d, TY %d MX %d MY %d \n", Xclick, Yclick, TouchX, TouchY);
+		}
+
+		
 	}
 
 	lpMsg->hwnd = hWnd;
@@ -342,112 +335,99 @@ WINBOOL PeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilter
 		lpMsg->lParam = (e.motion.y << 16) | (e.motion.x & 0xFFFF);
 		lpMsg->wParam = keystate_for_mouse(0);
 		break;
-	case SDL_FINGERDOWN: {	
-	#ifdef ANDROID
+	case SDL_FINGERDOWN: {
+#ifdef ANDROID
 
-		 int Xclick = e.tfinger.x * 640;
-		 int Yclick = e.tfinger.y * 480;
+		int Xclick = e.tfinger.x * 640;
+		int Yclick = e.tfinger.y * 480;
+		SDL_Log("FINGER EVENTS\n");
+		int fingernum = SDL_GetNumTouchFingers(e.tfinger.touchId);
 
-		 SDL_Log("TouchX %d TouchY %d ::: MouseX %d MouseY %d ::",Xclick, Yclick, MouseX, MouseY );
-		int MXX = ((float)MouseX * 640) / 1920;
-        int MYY = ((float)MouseY * 480) / 1080;
-
-		
-		SDL_Log("NORMX %d NORMY %d  :: Difference  X%d  Y%d ",MXX, MYY, Xclick - MXX, Yclick - MYY );
-		//mouseX = moseX * pixelX + camera.posX
-
-
-		int fingernum = SDL_GetNumTouchFingers( e.tfinger.touchId);
-
-		if(fingernum >= 2){
-			if (invflag){
+		if (fingernum >= 2) {
+			if (invflag) {
 				UseInvItem(myplr, pcursinvitem);
-			}
-			else{
-			//	SDL_Log("2 finger -- Right click --- X %d  Y %d \n",Xclick , Yclick );
-			   lpMsg->message = DVL_WM_RBUTTONDOWN;				// Not sure if this is needed...
-			   lpMsg->lParam = (Yclick << 16) | (Xclick & 0xFFFF);
-			   lpMsg->wParam = keystate_for_mouse(DVL_MK_RBUTTON);
-			   checkMonstersNearby(true, true);
-			  //RightMouseDown();
-
+			} else {
+				//	SDL_Log("2 finger -- Right click --- X %d  Y %d \n",Xclick , Yclick );
+				lpMsg->message = DVL_WM_RBUTTONDOWN; // Not sure if this is needed...
+				lpMsg->lParam = (Yclick << 16) | (Xclick & 0xFFFF);
+				lpMsg->wParam = keystate_for_mouse(DVL_MK_RBUTTON);
+				checkMonstersNearby(true, true);
 			}
 		}
 
-
-			if ( Xclick > Crect.x && Xclick < Crect.x+Crect.w && Yclick > Crect.y && Yclick < Crect.y+Crect.h){
+		if (Xclick > Crect.x && Xclick < Crect.x + Crect.w && Yclick > Crect.y && Yclick < Crect.y + Crect.h) {
 			SDL_Log("Right click\n");
 			lpMsg->message = DVL_WM_RBUTTONDOWN;
 			lpMsg->lParam = (Yclick << 16) | (Xclick & 0xFFFF);
 			lpMsg->wParam = keystate_for_mouse(DVL_MK_RBUTTON);
 			checkMonstersNearby(true, true);
-
-	}
-
-		 //SDL_Log("X %d Y %d ::: MX %d MY %d :: %d Fingers ", Xclick, Yclick, Shiftrect.x ,Shiftrect.y, fingernum  );
-
-		//X 77 Y 268 
-		//X 103 Y 296
-	if(Xclick > 75 && Xclick < 100 && Yclick > 265 && Yclick < 295  ){
-		if(!ShiftButtonPressed){
-			SDL_Log("SHIFT PRESSED\n");
-					ShiftButtonPressed = 1;
-
-		}else{
-			SDL_Log("SHIFT UNPRESSED\n");
-			ShiftButtonPressed = 0;
 		}
-	}
-/*
+		if (Xclick > 75 && Xclick < 100 && Yclick > 265 && Yclick < 295) {
+			if (!ShiftButtonPressed) {
+				SDL_Log("SHIFT PRESSED\n");
+				ShiftButtonPressed = 1;
 
- X 108 Y 404 ::: MX 70 MY 260
- X 176 Y 480 ::: MX 70 MY 260
- */
+			} else {
+				SDL_Log("SHIFT UNPRESSED\n");
+				ShiftButtonPressed = 0;
+			}
+		}
+		if (Xclick > Arect.x && Xclick < Arect.x + Arect.w && Yclick > Arect.y && Yclick < Arect.y + Arect.h) {
+			AttackButtonPressed = true;
 
-if(Xclick > 108 && Xclick < 175 && Yclick > 400 && Yclick < 480  ){
+			if (leveltype != DTYPE_TOWN) {
+				if (checkMonstersNearby(true, false) == false) { // Appears to works well.
+					ActivateObject(true);
+				}
+			} else {
+				checkTownersNearby(true);
+			}
+		}
+
+
+
+
+
+
+
+
+
+
+
+		if (Xclick > 108 && Xclick < 175 && Yclick > 400 && Yclick < 480) {
 			SDL_Log("Red Potion Used PRESSED\n");
 			useBeltPotion(false);
-	}
-
-/*
-X 484 Y 408 ::: MX 70 MY 260
-X 528 Y 465 ::: MX 70 MY 260
- */
-if(Xclick > 480 && Xclick < 530 && Yclick > 400 && Yclick < 480  ){
+		}
+		if (Xclick > 480 && Xclick < 530 && Yclick > 400 && Yclick < 480) {
 			SDL_Log("Blue Potion Used PRESSED\n");
 			useBeltPotion(true);
-	}
-		 /*   */ 
-	if (invflag || spselflag || chrflag || stextflag || questlog || helpflag || talkflag ||deathflag|| sgpCurrentMenu  || sbookflag || ShiftButtonPressed ||pcurs != CURSOR_HAND || // If flags
-	    Yclick > LGameUIMenu.y && Xclick < LGameUIMenu.w   || // OR if left panel click
-		Yclick > RGameUIMenu.y && Xclick > RGameUIMenu.x   || // OR if right panel click
-		Yclick > PotGameUIMenu.y && Xclick < PotGameUIMenu.w  // OR if belt click
-		
+		}
+		/*   */
+		if (invflag || spselflag || chrflag || stextflag || questlog || helpflag || talkflag || deathflag || sgpCurrentMenu || sbookflag || ShiftButtonPressed || pcurs != CURSOR_HAND || // If flags
+		    Xclick > LGameUIMenu.x   && Xclick < LGameUIMenu.x+LGameUIMenu.w     && Yclick > LGameUIMenu.y && Yclick < LGameUIMenu.y+LGameUIMenu.h  ||                                                                                                                           // OR if left panel click
+		    Xclick > RGameUIMenu.x   && Xclick < RGameUIMenu.x+RGameUIMenu.w     && Yclick > RGameUIMenu.y && Yclick < RGameUIMenu.y+RGameUIMenu.h ||                                                                                                                           // OR if right panel click
+		    Xclick > PotGameUIMenu.x && Xclick < PotGameUIMenu.x+PotGameUIMenu.w && Yclick > PotGameUIMenu.y && Yclick < PotGameUIMenu.y+PotGameUIMenu.h                                                                                                                        // OR if belt click
+
 		) {
-			if(ShiftButtonPressed){
-					 // SetCursorPos(MouseX, Yclick);
+			if (ShiftButtonPressed) {
 				LeftMouseCmd(true);
 
+			} else {
+
+				SDL_Log("Left click\n");
+				lpMsg->message = DVL_WM_LBUTTONDOWN;
+				lpMsg->lParam = (Yclick << 16) | (Xclick & 0xFFFF);
+				lpMsg->wParam = keystate_for_mouse(DVL_MK_LBUTTON);
 			}
-			else{
+		}
 
-			
-			SDL_Log("Left click\n");
-			lpMsg->message = DVL_WM_LBUTTONDOWN;
-			lpMsg->lParam = (Yclick << 16) | (Xclick & 0xFFFF);
-			lpMsg->wParam = keystate_for_mouse(DVL_MK_LBUTTON);
-			}
-	}
+	} break;
+#endif
 
-
-
-	  } break;
-	#endif
-
-	#ifndef ANDROID
+#ifndef ANDROID
 		int button = e.button.button;
 		if (button == SDL_BUTTON_LEFT) {
-			SDL_Log("BUTTON DOWN X %d  Y %d \n", e.button.x , e.button.y);
+			SDL_Log("BUTTON DOWN X %d  Y %d \n", e.button.x, e.button.y);
 			lpMsg->message = DVL_WM_LBUTTONDOWN;
 			lpMsg->lParam = (e.button.y << 16) | (e.button.x & 0xFFFF);
 			lpMsg->wParam = keystate_for_mouse(DVL_MK_LBUTTON);
@@ -458,49 +438,55 @@ if(Xclick > 480 && Xclick < 530 && Yclick > 400 && Yclick < 480  ){
 		} else {
 			return false_avail();
 		}
-	  } break;
+	}
+	break;
 
-	  #endif
-	case SDL_FINGERUP: { 
-		    AttackButtonPressed = false;
-	        CastButtonPressed   = false;
-			SDL_Log("Finger UP!\n");
-			 int Xclick = e.tfinger.x * 640;
-		 	 int Yclick = e.tfinger.y * 480;
-			lpMsg->message = DVL_WM_LBUTTONUP;
-			lpMsg->lParam = (Yclick << 16) | (Xclick & 0xFFFF);
-			lpMsg->wParam = keystate_for_mouse(0);
-			lpMsg->message = DVL_WM_RBUTTONUP;
-			lpMsg->lParam = (Yclick << 16) | (Xclick & 0xFFFF);
-			lpMsg->wParam = keystate_for_mouse(DVL_MK_RBUTTON);
-	}break;
-	case SDL_MOUSEBUTTONUP: {
-		int button = e.button.button;
-		if (button == SDL_BUTTON_LEFT) {
-			lpMsg->message = DVL_WM_LBUTTONUP;
-			lpMsg->lParam = (e.button.y << 16) | (e.button.x & 0xFFFF);
-			lpMsg->wParam = keystate_for_mouse(0);
-		} else if (button == SDL_BUTTON_RIGHT) {
-			lpMsg->message = DVL_WM_RBUTTONUP;
-			lpMsg->lParam = (e.button.y << 16) | (e.button.x & 0xFFFF);
-			lpMsg->wParam = keystate_for_mouse(0);
-		} else {
-			return false_avail();
-		}
-	 } break;
-	case SDL_TEXTINPUT:
-	case SDL_WINDOWEVENT:
-		if (e.window.event == SDL_WINDOWEVENT_CLOSE) {
-			lpMsg->message = DVL_WM_QUERYENDSESSION;
-		} else {
-			return false_avail();
-		}
-		break;
-	default:
-		DUMMY_PRINT("unknown SDL message 0x%X", e.type);
+#endif
+case SDL_FINGERUP: {
+	AttackButtonPressed = false;
+	CastButtonPressed = false;
+	SDL_Log("Finger UP!\n");
+	int Xclick = e.tfinger.x * 640;
+	int Yclick = e.tfinger.y * 480;
+	lpMsg->message = DVL_WM_LBUTTONUP;
+	lpMsg->lParam = (Yclick << 16) | (Xclick & 0xFFFF);
+	lpMsg->wParam = keystate_for_mouse(0);
+	lpMsg->message = DVL_WM_RBUTTONUP;
+	lpMsg->lParam = (Yclick << 16) | (Xclick & 0xFFFF);
+	lpMsg->wParam = keystate_for_mouse(DVL_MK_RBUTTON);
+	 SDL_PumpEvents();
+	SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
+} break;
+case SDL_MOUSEBUTTONUP: {
+	SDL_Log("MOUSE UP!\n");
+	int button = e.button.button;
+	if (button == SDL_BUTTON_LEFT) {
+		lpMsg->message = DVL_WM_LBUTTONUP;
+		lpMsg->lParam = (e.button.y << 16) | (e.button.x & 0xFFFF);
+		lpMsg->wParam = keystate_for_mouse(0);
+	} else if (button == SDL_BUTTON_RIGHT) {
+		lpMsg->message = DVL_WM_RBUTTONUP;
+		lpMsg->lParam = (e.button.y << 16) | (e.button.x & 0xFFFF);
+		lpMsg->wParam = keystate_for_mouse(0);
+		 SDL_PumpEvents();
+	SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
+	} else {
 		return false_avail();
 	}
-	return true;
+} break;
+case SDL_TEXTINPUT:
+case SDL_WINDOWEVENT:
+	if (e.window.event == SDL_WINDOWEVENT_CLOSE) {
+		lpMsg->message = DVL_WM_QUERYENDSESSION;
+	} else {
+		return false_avail();
+	}
+	break;
+default:
+	DUMMY_PRINT("unknown SDL message 0x%X", e.type);
+	return false_avail();
+}
+return true;
 }
 
 WINBOOL TranslateMessage(const MSG *lpMsg)
@@ -611,5 +597,4 @@ WINBOOL PostMessageA(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 	return true;
 }
-
 }

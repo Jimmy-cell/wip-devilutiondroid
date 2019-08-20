@@ -28,6 +28,8 @@ namespace dvl {
 	extern SDL_Texture * AJoyStickT;
 	extern SDL_Surface * ShiftStickS;
 	extern SDL_Texture * ShiftStickT;
+	extern SDL_Surface * DemoSqS;
+	extern SDL_Texture * DemoSqT;
 	extern SDL_Surface * Fog ;
 	extern SDL_Texture * gFog ;
 	extern bool ShiftButtonPressed ;
@@ -40,14 +42,32 @@ namespace dvl {
 } coords;
 extern coords speedspellscoords[50];
 
-
+extern SDL_Rect Arect;
 extern SDL_Rect Shiftrect;
 extern SDL_Rect LGameUIMenu;
 extern SDL_Rect RGameUIMenu;
 extern SDL_Rect PotGameUIMenu;
 extern SDL_Rect Crect;
 
-	
+extern SDL_Rect DemoN;
+extern SDL_Rect DemoS;
+extern SDL_Rect DemoE;
+extern SDL_Rect DemoW;
+
+extern SDL_Rect DemoNW;
+extern SDL_Rect DemoNE;	
+extern SDL_Rect DemoSW;
+extern SDL_Rect DemoSE;
+
+extern SDL_Rect DemonHealth;
+extern SDL_Rect AngelMana;
+
+
+
+
+
+
+
 	/*Finish */
 
 extern SDL_Window *window;
