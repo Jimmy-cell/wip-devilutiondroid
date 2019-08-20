@@ -13,7 +13,7 @@ Notes : I commented out the .gitsubmodules because theupstream wasn't inline wit
 
 To compile all you need to do is open the Android Studio and click the play button.
 
-If you don't want to compile there is a [RELEASE](https://github.com/ApertureSecurity/devilutionX-android/blob/master/release/app-debug.apk) 
+If you don't want to compile there is a [RELEASE](https://github.com/ApertureSecurity/devilutionX-android/releases/download/1.0b/devilution.apk) 
 
 YOU MUST OWN THE GAME INORDER FOR THIS TO WORK!
 
