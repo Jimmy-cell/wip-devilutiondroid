@@ -227,7 +227,19 @@ UINT GetDriveTypeA(LPCSTR lpRootPathName)
 
 WINBOOL DeleteFileA(LPCSTR lpFileName)
 {
-	UNIMPLEMENTED();
+	char name[DVL_MAX_PATH];
+	TranslateFileName(name, sizeof(name), lpFileName);
+
+	FILE *f = fopen(name, "r+"); 
+	if (f) {
+		fclose(f);
+		remove(name);
+		f = NULL;
+		eprintf("Removed file: %s\n", name);
+	} else {
+		eprintf("Failed to remove file: %s\n", name);
+	}
+
 	return true;
 }
 
@@ -290,9 +302,7 @@ WINBOOL SetForegroundWindow(HWND hWnd)
  */
 HWND SetFocus(HWND hWnd)
 {
-	if (SDL_SetWindowInputFocus(window) <= -1) {
-		SDL_Log(SDL_GetError());
-	}
+	SDL_RaiseWindow(window);
 	MainWndProc(NULL, DVL_WM_ACTIVATEAPP, true, 0); // SDL_WINDOWEVENT_FOCUS_GAINED
 	return NULL;
 }
@@ -338,7 +348,7 @@ HWND CreateWindowExA(
 
 		char scaleQuality[2] = "2";
 		DvlStringSetting("scaling quality", scaleQuality, 2);
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, 0);
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, scaleQuality);
 	} else if (fullscreen) {
 		flags |= SDL_WINDOW_FULLSCREEN;
 	}
@@ -349,13 +359,7 @@ HWND CreateWindowExA(
 		flags |= SDL_WINDOW_INPUT_GRABBED;
 	}
 
-
-	#ifdef ANDROID
-	//nWidth = 1920;
-	//nHeight = 1080;
-	#endif
-
-	window = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, nWidth, nHeight, SDL_WINDOW_FULLSCREEN);
+	window = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, nWidth, nHeight, flags);
 	if (window == NULL) {
 		SDL_Log(SDL_GetError());
 	}
@@ -366,21 +370,15 @@ HWND CreateWindowExA(
 		if (renderer == NULL) {
 			SDL_Log(SDL_GetError());
 		}
-		
 
 		texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, nWidth, nHeight);
 		if (texture == NULL) {
 			SDL_Log(SDL_GetError());
 		}
 
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear"); 
-		SDL_RenderSetLogicalSize(renderer, 640, 480);
-
-
-
-		// if (SDL_RenderSetLogicalSize(renderer, nWidth, nHeight) <= -1) {
-		// 	SDL_Log(SDL_GetError());
-		// }
+		if (SDL_RenderSetLogicalSize(renderer, nWidth, nHeight) <= -1) {
+			SDL_Log(SDL_GetError());
+		}
 	}
 
 	return window;
@@ -812,5 +810,4 @@ void __debugbreak()
 {
 	DUMMY();
 }
-
 }

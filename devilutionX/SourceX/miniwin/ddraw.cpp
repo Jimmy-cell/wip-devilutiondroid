@@ -236,8 +236,9 @@ HRESULT StubSurface::Unlock(LPVOID lpSurfaceData)
 			SDL_Log(SDL_GetError());
 		}
 
+		#ifdef ANDROID
 		DrawAndroidUI();
-
+		#endif
 		
 		
 		SDL_RenderPresent(renderer);

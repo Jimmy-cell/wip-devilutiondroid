@@ -89,7 +89,7 @@ bool DemoMode = false;
 	 JoyStickS = IMG_Load("/sdcard/Devilution/dpad.png");
      JoyStickT = SDL_CreateTextureFromSurface(renderer, JoyStickS);
 	 SDL_SetTextureBlendMode(JoyStickT, SDL_BLENDMODE_BLEND);
-	 SDL_SetTextureAlphaMod(JoyStickT, 255);
+	 SDL_SetTextureAlphaMod(JoyStickT, 175);
 
 
 	DemoSqS = IMG_Load("/sdcard/Devilution/demosq.png");
@@ -326,10 +326,6 @@ bool __fastcall checkMonstersNearby(bool attack,bool spellcast)
 }
 
 
-
-
-
-
 void AutoPickGold(int pnum) {
 	PlayerStruct& player = plr[pnum];
 	if (invflag) return;
@@ -392,7 +388,16 @@ void useBeltPotion(bool mana)
 	// }
 	//menuopenslow = ticks;
 	for (int i = 0; i < MAXBELTITEMS; i++) {
-		if ((AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_HEAL && mana == false) || (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLHEAL && mana == false) || (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_MANA && mana == true) || (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLMANA && mana == true) || (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_REJUV && AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLREJUV)) {
+		if ((AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_HEAL && mana == false) || 
+		   (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLHEAL && mana == false) || 
+		   (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_REJUV && mana == false) || 
+		   (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLREJUV && mana == false) || 
+
+		   (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_MANA && mana == true) || 
+		   (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLMANA && mana == true) 
+		   //(AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_REJUV && AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLREJUV)
+		   
+		   ) {
 			if (plr[myplr].SpdList[i]._itype > -1) {
 				invNum = i + INVITEM_BELT_FIRST;
 				UseInvItem(myplr, invNum);
@@ -480,16 +485,6 @@ void ActivateObject(bool interact){ // I think this function is dirty, but it do
 
 
 
-
-
-
-
-
-
-
-
-
-
 //ObjectStruct object[MAXOBJECTS];
 
 
@@ -561,6 +556,5 @@ void convert_touch_xy_to_game_xy(float touch_x, float touch_y, int *game_x, int 
 
 
 }
-
 
 

@@ -372,7 +372,7 @@ WINBOOL PeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilter
 				ShiftButtonPressed = 0;
 			}
 		}
-		if (Xclick > Arect.x && Xclick < Arect.x + Arect.w && Yclick > Arect.y && Yclick < Arect.y + Arect.h) {
+		if (!stextflag && Xclick > Arect.x && Xclick < Arect.x + Arect.w && Yclick > Arect.y && Yclick < Arect.y + Arect.h) {
 			AttackButtonPressed = true;
 
 			if (leveltype != DTYPE_TOWN) {
