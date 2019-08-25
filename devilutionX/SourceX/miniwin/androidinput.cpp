@@ -73,34 +73,30 @@ bool DemoMode = false;
 
 	//https://image.flaticon.com/icons/png/512/54/54528.png
 	//Loading Attack buttons
-	 AJoyStickS = IMG_Load("/sdcard/Devilution/input_attack.png");
+	 AJoyStickS = IMG_Load("/sdcard/Android/data/org.diasurgical.devilutionx/input_attack.png");
      AJoyStickT = SDL_CreateTextureFromSurface(renderer, AJoyStickS);
 	 SDL_SetTextureBlendMode(AJoyStickT, SDL_BLENDMODE_BLEND);
 	 SDL_SetTextureAlphaMod(AJoyStickT, 150);
 	 
 	 //https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Crossed_circle.svg/1200px-Crossed_circle.svg.png
-	 ShiftStickS = IMG_Load("/sdcard/Devilution/shift.png");
+	 ShiftStickS = IMG_Load("/sdcard/Android/data/org.diasurgical.devilutionx/shift.png");
      ShiftStickT = SDL_CreateTextureFromSurface(renderer, ShiftStickS);
 	 SDL_SetTextureBlendMode(ShiftStickT, SDL_BLENDMODE_BLEND);
 	 SDL_SetTextureAlphaMod(ShiftStickT, 255);
 
 
 	 //Loading Walking Joystick.
-	 JoyStickS = IMG_Load("/sdcard/Devilution/dpad.png");
+	 JoyStickS = IMG_Load("/sdcard/Android/data/org.diasurgical.devilutionx/dpad.png");
      JoyStickT = SDL_CreateTextureFromSurface(renderer, JoyStickS);
 	 SDL_SetTextureBlendMode(JoyStickT, SDL_BLENDMODE_BLEND);
 	 SDL_SetTextureAlphaMod(JoyStickT, 175);
 
 
-	DemoSqS = IMG_Load("/sdcard/Devilution/demosq.png");
+	DemoSqS = IMG_Load("/sdcard/Android/data/org.diasurgical.devilutionx/demosq.png");
 	DemoSqT = SDL_CreateTextureFromSurface(renderer, DemoSqS);
 	SDL_SetTextureBlendMode(DemoSqT, SDL_BLENDMODE_BLEND);
 	SDL_SetTextureAlphaMod(DemoSqT, 255);
 
-
-
-	
-	
     bool gbAndroidInterfaceLoaded = true;
  }
 
@@ -204,12 +200,6 @@ void __fastcall checkTownersNearby(bool interact)
 
 
 void DrawAndroidUI(){
-
-		//X 195 Y 355 MX 0 MY 350
-		//X 442 Y 383 MX 0 MY 350
-		
-
-
 	if(!invflag && !spselflag && !chrflag && !stextflag && !questlog && !helpflag && !talkflag && !qtextflag && !sgpCurrentMenu && gbRunGame){
 		//if(showJoystick){
 			DrawJoyStick(MouseX, MouseY, true);

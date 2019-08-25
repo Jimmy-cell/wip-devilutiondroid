@@ -4330,7 +4330,9 @@ void MAI_Lazurus(int i)
 	if (dFlags[mx][my] & BFLAG_VISIBLE) {
 		if (gbMaxPlayers == 1) {
 			if (Monst->mtalkmsg == QUEST_VILE13 && Monst->_mgoal == MGOAL_INQUIRING && plr[myplr].WorldX == QUEST_VILE13 && plr[myplr].WorldY == 46) {
-				PlayInGameMovie("gendata\\fprst3.smk");
+				#ifndef ANDROID
+				PlayInGameMovie("gendata\\fprst3.smk"); //CHANGE LAZ
+				#endif
 				Monst->_mmode = MM_TALK;
 				quests[QTYPE_VB]._qvar1 = 5;
 			}

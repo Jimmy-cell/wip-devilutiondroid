@@ -265,6 +265,12 @@ WINBOOL PeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilter
 			AutoPickItem(myplr);
 			walkInDir(WALK_SE);
 			
+		}else{
+			SDL_Log("---Nothing\n");
+	
+			
+
+
 		}
 
 		
@@ -372,7 +378,7 @@ WINBOOL PeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilter
 				ShiftButtonPressed = 0;
 			}
 		}
-		if (!stextflag && Xclick > Arect.x && Xclick < Arect.x + Arect.w && Yclick > Arect.y && Yclick < Arect.y + Arect.h) {
+		if (!sbookflag && !invflag && !stextflag && Xclick > Arect.x && Xclick < Arect.x + Arect.w && Yclick > Arect.y && Yclick < Arect.y + Arect.h) {
 			AttackButtonPressed = true;
 
 			if (leveltype != DTYPE_TOWN) {
@@ -383,16 +389,6 @@ WINBOOL PeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilter
 				checkTownersNearby(true);
 			}
 		}
-
-
-
-
-
-
-
-
-
-
 
 		if (Xclick > 108 && Xclick < 175 && Yclick > 400 && Yclick < 480) {
 			SDL_Log("Red Potion Used PRESSED\n");
@@ -443,6 +439,8 @@ WINBOOL PeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilter
 
 #endif
 case SDL_FINGERUP: {
+	TouchX = 0;
+	TouchY = 0;
 	AttackButtonPressed = false;
 	CastButtonPressed = false;
 	SDL_Log("Finger UP!\n");

@@ -24,6 +24,24 @@ static std::string build_cmdline(int argc, char **argv)
 
 #ifdef __ANDROID__
 int SDL_main(int argc, char* argv[]) {
+// I am placing this here becasue I don't want to stub another file. 
+
+const int dir_err = system("mkdir -p /sdcard/devilutionx");
+if (-1 == dir_err)
+{
+    printf("Error creating directory!n");
+    exit(1);
+}
+
+//org.diasurgical.devilutionx
+const int dir_errx = system("mkdir -p /sdcard/Android/data/org.diasurgical.devilutionx");
+if (-1 == dir_errx)
+{
+    printf("Error creating directory!n");
+    exit(1);
+}
+
+
 	return dvl::WinMain(NULL, NULL, (char *)"", 0);
 }
 #else
