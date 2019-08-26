@@ -1,550 +1,598 @@
-
 #include "devilution.h"
-#include "miniwin/ddraw.h"
 #include "stubs.h"
 #include <SDL.h>
-#include <SDL_image.h>
-#include <time.h>
+#include <deque>
 
-#include "DiabloUI/diabloui.h"
+#ifdef ANDROID
+#include "miniwin/ddraw.h"
+#endif
+
+/** @file
+ * *
+ * Windows message handling and keyboard event conversion for SDL.
+ */
 
 namespace dvl {
-	 SDL_Surface * JoyStickS;
-	 SDL_Texture * JoyStickT;
-	 SDL_Surface * AJoyStickS;
-	 SDL_Texture * AJoyStickT;
-	 SDL_Surface * ShiftStickS;
-	 SDL_Texture * ShiftStickT;
 
-	 SDL_Surface * DemoSqS;
-	 SDL_Texture * DemoSqT;
+static std::deque<MSG> message_queue;
 
-	 SDL_Surface * Fog  = NULL;
-	 SDL_Texture * gFog = NULL;
-
-
-coords speedspellscoords[50];
-bool ShiftButtonPressed = 0;
-bool DemoModeEnabled=0;
-
- 
- 
- 
-SDL_Rect PotGameUIMenu ={195,350,245,50};
-SDL_Rect RGameUIMenu={555,350,85,130};
-SDL_Rect LGameUIMenu={0,350,85,130};
-SDL_Rect Arect={520,250,110,105};
-SDL_Rect Crect={565,180,60,60}; 
-SDL_Rect Shiftrect={68,257,58,52};
-
-
-
-SDL_Rect DemoN ={68,202,58,52}; 
-SDL_Rect DemoE ={140,257,58,52};   
-SDL_Rect DemoW ={0,257,58,52};		
-SDL_Rect DemoS ={68,315,58,52};  
-
-
-SDL_Rect DemoNW={0,204,58,52};
-SDL_Rect DemoNE={140,204,58,52};	
-SDL_Rect DemoSW={0,315,58,52};
-SDL_Rect DemoSE={140,315,58,52};
-
-
-SDL_Rect DemonHealth={100,350,85,130};
-SDL_Rect AngelMana={460,350,85,130};
-
-
-
-bool AttackButtonPressed;
-bool CastButtonPressed;
-bool gbAndroidInterfaceLoaded = 0;	   
-bool showJoystick = true;
-bool newCurHidden = false;
-
-bool DemoMode = false;
-//			SDL_BlitSurface(surface, &source_rect, temp_surface, NULL);
-            // Figure out transparency.
-           
-
-
- void LoadAndroidImages(){
-	 IMG_Init(IMG_INIT_PNG);
-
-	//https://image.flaticon.com/icons/png/512/54/54528.png
-	//Loading Attack buttons
-	 AJoyStickS = IMG_Load("/sdcard/Android/data/org.diasurgical.devilutionx/input_attack.png");
-     AJoyStickT = SDL_CreateTextureFromSurface(renderer, AJoyStickS);
-	 SDL_SetTextureBlendMode(AJoyStickT, SDL_BLENDMODE_BLEND);
-	 SDL_SetTextureAlphaMod(AJoyStickT, 150);
-	 
-	 //https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Crossed_circle.svg/1200px-Crossed_circle.svg.png
-	 ShiftStickS = IMG_Load("/sdcard/Android/data/org.diasurgical.devilutionx/shift.png");
-     ShiftStickT = SDL_CreateTextureFromSurface(renderer, ShiftStickS);
-	 SDL_SetTextureBlendMode(ShiftStickT, SDL_BLENDMODE_BLEND);
-	 SDL_SetTextureAlphaMod(ShiftStickT, 255);
-
-
-	 //Loading Walking Joystick.
-	 JoyStickS = IMG_Load("/sdcard/Android/data/org.diasurgical.devilutionx/dpad.png");
-     JoyStickT = SDL_CreateTextureFromSurface(renderer, JoyStickS);
-	 SDL_SetTextureBlendMode(JoyStickT, SDL_BLENDMODE_BLEND);
-	 SDL_SetTextureAlphaMod(JoyStickT, 175);
-
-
-	DemoSqS = IMG_Load("/sdcard/Android/data/org.diasurgical.devilutionx/demosq.png");
-	DemoSqT = SDL_CreateTextureFromSurface(renderer, DemoSqS);
-	SDL_SetTextureBlendMode(DemoSqT, SDL_BLENDMODE_BLEND);
-	SDL_SetTextureAlphaMod(DemoSqT, 255);
-
-    bool gbAndroidInterfaceLoaded = true;
- }
-
-
-
-void HideCursor()
+static int translate_sdl_key(SDL_Keysym key)
 {
-	if (pcurs >= CURSOR_FIRSTITEM) // if we don't drop the item on cursor, it will be destroyed
-		DropItemBeforeTrig();
-	SetCursorPos(320, 180);
-	SetCursor_(CURSOR_NONE); // works?
-	newCurHidden = true;
-}
-
-
-void DrawJoyStick(int MouseX, int MouseY, bool flag){
-
-		 SDL_Rect Jrect;
-         Jrect.x = 1; // I want this to be dynamic
-         Jrect.y = 200;
-         Jrect.h = 170;
-         Jrect.w = 190; 
-
-		 //TX 181, TY 309 MX 181 MY 309
-	SDL_RenderCopy(renderer, JoyStickT, NULL, &Jrect);
-	if(DemoModeEnabled){
-	
-	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoE);
-	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoW); 
-	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoS);
-	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoN); 
-
-	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoNE);
-	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoNW);
-	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoSE);
-	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoSW);
-
-	SDL_RenderCopy(renderer, DemoSqT, NULL, &LGameUIMenu);
-	SDL_RenderCopy(renderer, DemoSqT, NULL, &RGameUIMenu);
-	SDL_RenderCopy(renderer, DemoSqT, NULL, &PotGameUIMenu);
-
-	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemonHealth);
-	SDL_RenderCopy(renderer, DemoSqT, NULL, &AngelMana);
+	// ref: https://wiki.libsdl.org/SDL_Keycode
+	// ref: https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+	int sym = key.sym;
+	switch (sym) {
+	case SDLK_BACKSPACE:
+		return DVL_VK_BACK;
+	case SDLK_TAB:
+		return DVL_VK_TAB;
+	case SDLK_RETURN:
+		return DVL_VK_RETURN;
+	case SDLK_ESCAPE:
+		return DVL_VK_ESCAPE;
+	case SDLK_SPACE:
+		return DVL_VK_SPACE;
+	case SDLK_QUOTE:
+		return DVL_VK_OEM_7;
+	case SDLK_COMMA:
+		return DVL_VK_OEM_COMMA;
+	case SDLK_MINUS:
+		return DVL_VK_OEM_MINUS;
+	case SDLK_PERIOD:
+		return DVL_VK_OEM_PERIOD;
+	case SDLK_SLASH:
+		return DVL_VK_OEM_2;
+	case SDLK_SEMICOLON:
+		return DVL_VK_OEM_1;
+	case SDLK_EQUALS:
+		return DVL_VK_OEM_PLUS;
+	case SDLK_LEFTBRACKET:
+		return DVL_VK_OEM_4;
+	case SDLK_BACKSLASH:
+		return DVL_VK_OEM_5;
+	case SDLK_RIGHTBRACKET:
+		return DVL_VK_OEM_6;
+	case SDLK_BACKQUOTE:
+		return DVL_VK_OEM_3;
+	case SDLK_DELETE:
+		return DVL_VK_DELETE;
+	case SDLK_CAPSLOCK:
+		return DVL_VK_CAPITAL;
+	case SDLK_F1:
+		return DVL_VK_F1;
+	case SDLK_F2:
+		return DVL_VK_F2;
+	case SDLK_F3:
+		return DVL_VK_F3;
+	case SDLK_F4:
+		return DVL_VK_F4;
+	case SDLK_F5:
+		return DVL_VK_F5;
+	case SDLK_F6:
+		return DVL_VK_F6;
+	case SDLK_F7:
+		return DVL_VK_F7;
+	case SDLK_F8:
+		return DVL_VK_F8;
+	case SDLK_F9:
+		return DVL_VK_F9;
+	case SDLK_F10:
+		return DVL_VK_F10;
+	case SDLK_F11:
+		return DVL_VK_F11;
+	case SDLK_F12:
+		return DVL_VK_F12;
+	case SDLK_PRINTSCREEN:
+		return DVL_VK_SNAPSHOT;
+	case SDLK_SCROLLLOCK:
+		return DVL_VK_SCROLL;
+	case SDLK_PAUSE:
+		return DVL_VK_PAUSE;
+	case SDLK_INSERT:
+		return DVL_VK_INSERT;
+	case SDLK_HOME:
+		return DVL_VK_HOME;
+	case SDLK_PAGEUP:
+		return DVL_VK_PRIOR;
+	case SDLK_END:
+		return DVL_VK_END;
+	case SDLK_PAGEDOWN:
+		return DVL_VK_NEXT;
+	case SDLK_RIGHT:
+		return DVL_VK_RIGHT;
+	case SDLK_LEFT:
+		return DVL_VK_LEFT;
+	case SDLK_DOWN:
+		return DVL_VK_DOWN;
+	case SDLK_UP:
+		return DVL_VK_UP;
+	case SDLK_NUMLOCKCLEAR:
+		return DVL_VK_NUMLOCK;
+	case SDLK_KP_DIVIDE:
+		return DVL_VK_DIVIDE;
+	case SDLK_KP_MULTIPLY:
+		return DVL_VK_MULTIPLY;
+	case SDLK_KP_MINUS:
+		// Returning DVL_VK_OEM_MINUS to play nice with Devilution automap zoom.
+		//
+		// For a distinct keypad key-code, DVL_VK_SUBTRACT should be returned.
+		return DVL_VK_OEM_MINUS;
+	case SDLK_KP_PLUS:
+		// Returning DVL_VK_OEM_PLUS to play nice with Devilution automap zoom.
+		//
+		// For a distinct keypad key-code, DVL_VK_ADD should be returned.
+		return DVL_VK_OEM_PLUS;
+	case SDLK_KP_ENTER:
+		return DVL_VK_RETURN;
+	case SDLK_KP_1:
+		return DVL_VK_NUMPAD1;
+	case SDLK_KP_2:
+		return DVL_VK_NUMPAD2;
+	case SDLK_KP_3:
+		return DVL_VK_NUMPAD3;
+	case SDLK_KP_4:
+		return DVL_VK_NUMPAD4;
+	case SDLK_KP_5:
+		return DVL_VK_NUMPAD5;
+	case SDLK_KP_6:
+		return DVL_VK_NUMPAD6;
+	case SDLK_KP_7:
+		return DVL_VK_NUMPAD7;
+	case SDLK_KP_8:
+		return DVL_VK_NUMPAD8;
+	case SDLK_KP_9:
+		return DVL_VK_NUMPAD9;
+	case SDLK_KP_0:
+		return DVL_VK_NUMPAD0;
+	case SDLK_KP_PERIOD:
+		return DVL_VK_DECIMAL;
+	case SDLK_MENU:
+		return DVL_VK_MENU;
+	case SDLK_KP_COMMA:
+		return DVL_VK_OEM_COMMA;
+	case SDLK_LCTRL:
+		return DVL_VK_LCONTROL;
+	case SDLK_LSHIFT:
+		return DVL_VK_LSHIFT;
+	case SDLK_LALT:
+		return DVL_VK_LMENU;
+	case SDLK_LGUI:
+		return DVL_VK_LWIN;
+	case SDLK_RCTRL:
+		return DVL_VK_RCONTROL;
+	case SDLK_RSHIFT:
+		return DVL_VK_RSHIFT;
+	case SDLK_RALT:
+		return DVL_VK_RMENU;
+	case SDLK_RGUI:
+		return DVL_VK_RWIN;
+	default:
+		if (sym >= SDLK_a && sym <= SDLK_z) {
+			return 'A' + (sym - SDLK_a);
+		} else if (sym >= SDLK_0 && sym <= SDLK_9) {
+			return '0' + (sym - SDLK_0);
+		} else if (sym >= SDLK_F1 && sym <= SDLK_F12) {
+			return DVL_VK_F1 + (sym - SDLK_F1);
+		}
+		DUMMY_PRINT("unknown key: name=%s sym=0x%X scan=%d mod=0x%X", SDL_GetKeyName(sym), sym, key.scancode, key.mod);
+		return -1;
 	}
-
-//LGameUIMenu
-
 }
 
-
-void walkInDir(int dir)
+static WPARAM keystate_for_mouse(WPARAM ret)
 {
-	if (invflag || spselflag || chrflag) // don't walk if inventory, speedbook or char info windows are open
-		return;
-	// ticks = GetTickCount();
-	// if (ticks - invmove < 370) {
-	// 	return;
-	// }
-	//invmove = ticks;
-	ClrPlrPath(myplr);                   // clear nodes
-	plr[myplr].destAction = ACTION_NONE; // stop attacking, etc.
-//	HideCursor();
-//	SetCursor_(0);
-	plr[myplr].walkpath[0] = dir;
+	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
+	ret |= keystate[SDL_SCANCODE_LSHIFT] ? DVL_MK_SHIFT : 0;
+	ret |= keystate[SDL_SCANCODE_RSHIFT] ? DVL_MK_SHIFT : 0;
+	// XXX: other DVL_MK_* codes not implemented
+	return ret;
 }
 
-
-coords checkNearbyObjs(int x, int y, int diff)
+static WINBOOL false_avail()
 {
-	int diff_x = abs(plr[myplr]._px - x);
-	int diff_y = abs(plr[myplr]._py - y);
-
-	if (diff_x <= diff && diff_y <= diff) {
-		coords cm = { diff_x, diff_y };
-		//sprintf(tempstr, "N-DIFF X:%i Y:%i", diff_x, diff_y);
-		//NetSendCmdString(1 << myplr, tempstr);
-		return cm;
-	}
-	return { -1, -1 };
-}
-
-
-
-
-void __fastcall checkTownersNearby(bool interact)
-{
-	for (int i = 0; i < 16; i++) {
-		if (checkNearbyObjs(towner[i]._tx, towner[i]._ty, 2).x != -1) {
-
-			if (towner[i]._ttype == -1)
-				continue;
-			pcursmonst = i;
-			if (interact) {
-				plr[myplr].destAction = ACTION_NONE;
-				TalkToTowner(myplr, i);
-			}
-			break;
-		}
-	}
-}
-
-
-void DrawAndroidUI(){
-	if(!invflag && !spselflag && !chrflag && !stextflag && !questlog && !helpflag && !talkflag && !qtextflag && !sgpCurrentMenu && gbRunGame){
-		//if(showJoystick){
-			DrawJoyStick(MouseX, MouseY, true);
-			
-
-
-			if (AttackButtonPressed){
-				SDL_SetTextureColorMod(ShiftStickT, 255, 0, 0);
-				SDL_RenderCopy(renderer, AJoyStickT, NULL, &Arect);
-			}
-			else{
-				SDL_SetTextureColorMod(ShiftStickT, 255, 0, 0);
-				SDL_RenderCopy(renderer, AJoyStickT, NULL, &Arect);
-			}
-
-
-			if(CastButtonPressed){
-				SDL_SetTextureColorMod(ShiftStickT, 255, 0, 0);
-				SDL_RenderCopy(renderer, AJoyStickT, NULL, &Crect);
-
-			}
-			else{
-				SDL_RenderCopy(renderer, AJoyStickT, NULL, &Crect);
-				
-			}
-
-
-
-
-
-		if (ShiftButtonPressed){
-			SDL_SetTextureColorMod(ShiftStickT, 255, 0, 0);
-			SDL_RenderCopy(renderer, ShiftStickT, NULL, &Shiftrect);
-		}
-		else{
-			SDL_SetTextureColorMod(ShiftStickT, 220,220,220);
-			SDL_RenderCopy(renderer, ShiftStickT, NULL, &Shiftrect);
-			if(DemoModeEnabled){
-				SDL_RenderCopy(renderer, DemoSqT, NULL, &Shiftrect);
-			}
-			
-		}
-	}	
-}
-
-
-
-bool __fastcall checkMonstersNearby(bool attack,bool spellcast)
-{
-	int rspell, sd, sl;
-	sl = GetSpellLevel(myplr, plr[myplr]._pRSpell);
-
-
-	int closest = 0;                 // monster ID who is closest
-	coords objDistLast = { 135, 135 }; // previous obj distance
-	for (int i = 0; i < MAXMONSTERS; i++) {
-		int d_monster = dMonster[monster[i]._mx][monster[i]._my];
-		if (monster[i]._mFlags & MFLAG_HIDDEN || monster[i]._mhitpoints <= 0) // monster is hiding or dead, skip
-			continue;
-		if (d_monster && dFlags[monster[i]._mx][monster[i]._my] & BFLAG_LIT) {                                                                          // is monster visible
-			if (monster[i].MData->mSelFlag & 1 || monster[i].MData->mSelFlag & 2 || monster[i].MData->mSelFlag & 3 || monster[i].MData->mSelFlag & 4) { // is monster selectable
-				coords objDist = checkNearbyObjs(monster[i]._mx, monster[i]._my, 6);
-				if (objDist.x > -1 && objDist.x <= objDistLast.x && objDist.y <= objDistLast.y) {
-					closest = i;
-					objDistLast = objDist;
-				}
-			}
-		}
-	}
-	if (closest > 0) { // did we find a monster
-		pcursmonst = closest;
-		//sprintf(tempstr, "NEARBY MONSTER WITH HP:%i", monster[closest]._mhitpoints);
-		//NetSendCmdString(1 << myplr, tempstr);
-	} else if (closest > 0) { // found monster, but we don't want to attack it
-		return true;
-	} else {
-		checkItemsNearby(true);
-	//	LeftMouseCmd(true);// I would like SHIFT ATTACK To exist...
-		pcursmonst = -1;
-		return false;
-	}
-	if (attack) {
-		// if (ticks - attacktick > 100) { // prevent accidental double attacks
-		// 	attacktick = ticks;
-		if(ShiftButtonPressed){
-			if(spellcast){
-			sd = GetDirection(plr[myplr].WorldX, plr[myplr].WorldY, monster[pcursmonst]._mx, monster[pcursmonst]._my);
-			sl = GetSpellLevel(myplr, plr[myplr]._pRSpell);
-			NetSendCmdLocParam3(true, CMD_SPELLXYD, monster[pcursmonst]._mx, monster[pcursmonst]._my, plr[myplr]._pRSpell, sd, sl); //CAST SPELL
-			}
-			else{
-			LeftMouseCmd(true);
-			}
-			
-		}else{
-			if(spellcast){
-			sd = GetDirection(plr[myplr].WorldX, plr[myplr].WorldY, monster[pcursmonst]._mx, monster[pcursmonst]._my);
-			sl = GetSpellLevel(myplr, plr[myplr]._pRSpell);
-			NetSendCmdLocParam3(true, CMD_SPELLXYD, monster[pcursmonst]._mx, monster[pcursmonst]._my, plr[myplr]._pRSpell, sd, sl); //CAST SPELL
-			}
-			else{
-			LeftMouseCmd(false);
-			}
-		}
-
-				
-		// }
-		return true;
-	} else {
-		return true;
-	}
-	pcursmonst = -1;
+	DUMMY_PRINT("return false although event available", 1);
 	return false;
 }
 
+#ifdef ANDROID
+int num_fingers_down = 0;
+int Xbase = 0;
+int Ybase = 0;
+#endif
 
-void AutoPickGold(int pnum) {
-	PlayerStruct& player = plr[pnum];
-	if (invflag) return;
-	for (int orient = 0; orient < 9; ++orient) {
-		int row = player.WorldX + pathxdir[orient];
-		int col = player.WorldY + pathydir[orient];
-		int itemIndex = dItem[row][col] - 1;
-		if (itemIndex > -1) {
-			char* pcursitem = (char*)&item;
-			ItemStruct* it = &(item[itemIndex]);
-			if (it->_itype == ITYPE_GOLD) {
-				NetSendCmdGItem(1u, CMD_REQUESTAGITEM, pnum, pnum, itemIndex);
-				item[itemIndex]._iRequest = 1;
-				//dItem[row][col] = 0;
-				PlaySFX(68);
-				//AddPanelString("Item Picked Up! ", true);
-				  char tempstr[255] = {0};
-   				  sprintf(tempstr, "Item Picked Up! %s",it->_iName );
-				  DrawInvMsg(tempstr);
-
-			}
-		}
-	}
-}
-
-void AutoPickItem(int pnum){
-//if (GetConfigBoolVariable("autoPickGold") == false) { return; }
-	PlayerStruct& player = plr[pnum];
-	if (invflag) return;
-	for (int orient = 0; orient < 9; ++orient) {
-		int row = player.WorldX; //+ pathxdir[orient];
-		int col = player.WorldY; //+ pathydir[orient];
-
-		int itemIndex = dItem[row][col] - 1;
-		if (itemIndex > -1) {
-			char* pcursitem = (char*)&item;
-			ItemStruct* it = &(item[itemIndex]);
-			if (it->_itype != ITYPE_NONE || it->_itype != ITYPE_0E ) {
-				NetSendCmdGItem(1u, CMD_REQUESTAGITEM, pnum, pnum, itemIndex);
-				item[itemIndex]._iRequest = 1;
-				//dItem[row][col] = 0;
-				PlaySFX(68);
-     			//AddPanelString("Item Picked up! ", true);
-
-				  char tempstr[255] = {0};
-   				  sprintf(tempstr, "Item Picked Up! %s",it->_iName );
-				  DrawInvMsg(tempstr);
-
-			}
-		}
-	}
-}
-
-
-void useBeltPotion(bool mana)
+WINBOOL PeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg)
 {
-	int invNum = 0;
-	// if (ticks - menuopenslow < 300) {
-	// 	return;
-	// }
-	//menuopenslow = ticks;
-	for (int i = 0; i < MAXBELTITEMS; i++) {
-		if ((AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_HEAL && mana == false) || 
-		   (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLHEAL && mana == false) || 
-		   (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_REJUV && mana == false) || 
-		   (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLREJUV && mana == false) || 
+	if (wMsgFilterMin != 0)
+		UNIMPLEMENTED();
+	if (wMsgFilterMax != 0)
+		UNIMPLEMENTED();
+	if (hWnd != NULL)
+		UNIMPLEMENTED();
+	SDL_Event e;
 
-		   (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_MANA && mana == true) || 
-		   (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLMANA && mana == true) 
-		   //(AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_REJUV && AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLREJUV)
-		   
-		   ) {
-			if (plr[myplr].SpdList[i]._itype > -1) {
-				invNum = i + INVITEM_BELT_FIRST;
-				UseInvItem(myplr, invNum);
-				break;
-			}
+
+
+#ifdef ANDROID
+	//SDL_Log("SDL EVENT TYPE %d", e.type);
+
+	SDL_RenderSetLogicalSize(renderer, 640, 480);
+
+	if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT) && (!invflag && !spselflag && !chrflag && !stextflag && !questlog && !helpflag && !talkflag)) 
+	{
+		SDL_Log("WALKING\n");
+
+		if (TouchX > DemoN.x && TouchX < DemoN.x + DemoN.w && TouchY > DemoN.y && TouchY < DemoN.y + DemoN.h) {
+			AutoPickGold(myplr);
+			AutoPickItem(myplr);
+			walkInDir(WALK_N);
 		}
-	}
-}
-
-
-/*
-
-typedef enum direction {
-	DIR_S    = 0x0,
-	DIR_SW   = 0x1,
-	DIR_W    = 0x2,
-	DIR_NW   = 0x3,
-	DIR_N    = 0x4,
-	DIR_NE   = 0x5,
-	DIR_E    = 0x6,
-	DIR_SE   = 0x7,
-	DIR_OMNI = 0x8,
-} direction;
- */
-
-void ActivateObjectz(bool interact){
-	for (int i = 0; i < MAXOBJECTS; i++) {
-		if (checkNearbyObjs(object[i]._ox, object[i]._oy, 1).x != -1 && object[i]._oSelFlag > 0 && object[i]._otype > -1 && currlevel) { // make sure we're in the dungeon to scan for objs
-			pcursobj = i;
-			if (interact) {
-				LeftMouseCmd(false);
-			}
+		if (TouchX > DemoE.x && TouchX < DemoE.x + DemoE.w && TouchY > DemoE.y && TouchY < DemoE.y + DemoE.h) {
+			AutoPickGold(myplr);
+			AutoPickItem(myplr);
+			walkInDir(WALK_E);
 		}
-	}
-}
 
-/**
- * if (monster[i].MData->mSelFlag & 1 || monster[i].MData->mSelFlag & 2 || monster[i].MData->mSelFlag & 3 || monster[i].MData->mSelFlag & 4) { // is monster selectable
-				coords objDist = checkNearbyObjs(monster[i]._mx, monster[i]._my, 6);
-				if (objDist.x > -1 && objDist.x <= objDistLast.x && objDist.y <= objDistLast.y) {
-					closest = i;
-					objDistLast = objDist;
-				}
-			}
+		if (TouchX > DemoW.x && TouchX < DemoW.x + DemoW.w && TouchY > DemoW.y && TouchY < DemoW.y + DemoW.h) {
+			AutoPickGold(myplr);
+			AutoPickItem(myplr);
+			walkInDir(WALK_W);
+		}
 
- */
+		if (TouchX > DemoS.x && TouchX < DemoS.x + DemoS.w && TouchY > DemoS.y && TouchY < DemoS.y + DemoS.h) {
+			AutoPickGold(myplr);
+			AutoPickItem(myplr);
+			walkInDir(WALK_S);
+		}
 
-//coords objDist = checkNearbyObjs(monster[i]._mx, monster[i]._my, 6);
+		if (TouchX > DemoNE.x && TouchX < DemoNE.x + DemoNE.w && TouchY > DemoNE.y && TouchY < DemoNE.y + DemoNE.h) {
+			AutoPickGold(myplr);
+			AutoPickItem(myplr);
+			walkInDir(WALK_NE);
+		}
 
-
-
-int diff_ms(timeval t1, timeval t2)
-{
-    return (((t1.tv_sec - t2.tv_sec) * 1000000) + 
-            (t1.tv_usec - t2.tv_usec))/1000;
-}
-
-
-
-
-void ActivateObject(bool interact){ // I think this function is dirty, but it does what I want.
-	int closest = 0;     
-	coords objDistLast = { 10, 10 }; // previous obj distance
-	for (int i = 0; i < MAXOBJECTS; i++) {
-		
-		if (checkNearbyObjs(object[i]._ox, object[i]._oy, 1).x != -1 && object[i]._oSelFlag > 0 && object[i]._otype > -1 && currlevel) { // make sure we're in the dungeon to scan for objs
-			pcursobj = i;
-			coords objDist = checkNearbyObjs(object[i]._ox, object[i]._oy, 6);
+		if (TouchX > DemoNW.x && TouchX < DemoNW.x + DemoNW.w && TouchY > DemoNW.y && MouseY < DemoNW.y + DemoNW.h) {
+			AutoPickGold(myplr);
+			AutoPickItem(myplr);
+			walkInDir(WALK_NW);
+		}
+		if (TouchX > DemoSW.x && TouchX < DemoSW.x + DemoSW.w && TouchY > DemoSW.y && TouchY < DemoSW.y + DemoSW.h) {
+			AutoPickGold(myplr);
+			AutoPickItem(myplr);
+			walkInDir(WALK_SW);
+		}
+		if (TouchX > DemoSE.x && TouchX < DemoSE.x + DemoSE.w && TouchY > DemoSE.y && TouchY < DemoSE.y + DemoSE.h) {
+			AutoPickGold(myplr);
+			AutoPickItem(myplr);
+			walkInDir(WALK_SE);
 			
-			if (objDist.x > -1 && objDist.x <= objDistLast.x && objDist.y <= objDistLast.y) {
-					closest = i;
-					//objDistLast = objDist;
-					if (interact) {
-						NetSendCmdLocParam1(true, pcurs == CURSOR_DISARM ? CMD_DISARMXY : CMD_OPOBJXY,  object[closest]._ox, object[closest]._oy, pcursobj);
-						Sleep(20); // might be good to remove this thing.
-					}
-
-
-				}
-
-			
-		}
-	}
-}
-
-
-
-//ObjectStruct object[MAXOBJECTS];
-
-
-void __fastcall checkItemsNearby(int pnum)
-{
-	PlayerStruct& player = plr[pnum];
-	for (int orient = 0; orient < 9; ++orient) {
-		int row = player.WorldX + pathxdir[orient];
-		int col = player.WorldY + pathydir[orient];
-		checkNearbyObjs(row,col,1);
-				  //char tempstr[255] = {0};
-   				  //sprintf(tempstr, "Activated!");
-				  //DrawInvMsg(tempstr);
-				  //NetSendCmdGItem(1u, CMD_REQUESTAGITEM, pnum, pnum, itemIndex);
-				  //OperateObject(pnum, int i, BOOL TeleFlag)
-				  SetCursorPos(item[orient]._ix, item[orient]._iy);
-				  LeftMouseCmd(false);
-
-			
-		}
-}
-
-template<typename T> inline T CLIP(T v, T amin, T amax)
-	{ if (v < amin) return amin; else if (v > amax) return amax; else return v; }
-
-
-int TouchX = 0;
-int TouchY = 0;
-#define DISPLAY_WIDTH 1920
-#define DISPLAY_HEIGHT 1080
-#define GAME_WIDTH 640
-#define GAME_HEIGHT 480
-
-
-void convert_touch_xy_to_game_xy(float touch_x, float touch_y, int *game_x, int *game_y) {
-
-	const int screen_h = GAME_HEIGHT;
-	const int screen_w = GAME_WIDTH;
-	const int disp_w   = DISPLAY_WIDTH;
-	const int disp_h   = DISPLAY_HEIGHT;
-
-	int x, y, w, h;
-	float sx, sy;
-
-	h = disp_h;
-	w = h * 16.0/9.0;
-
-	x = (disp_w - w) / 2;
-	y = (disp_h - h) / 2;
-
-	sy = (float) h / (float) screen_h;
-	sx = (float) w / (float) screen_w;
-
-	// Find touch coordinates in terms of screen pixels
-	float disp_touch_x = (touch_x * (float) disp_w);
-	float disp_touch_y = (touch_y * (float) disp_h);
-
-	*game_x = CLIP((int)((disp_touch_x - x) / sx), 0, (int) GAME_WIDTH);
-	*game_y = CLIP((int)((disp_touch_y - y) / sy), 0, (int) GAME_HEIGHT);
-
-	int foox = *game_x;
-	int fooy = *game_y;
-	TouchX = *game_x;
-	TouchY = *game_y;
+		}else{
+			SDL_Log("---Nothing\n");
 	
-	//SDL_Log("GAME_X %d GAME_Y %d ", foox, fooy);
+			
+
+
+		}
+
+		
+	}
+
+
+	else{
+	SDL_Log("---Nothing\n");
+		
+	}
+
+#endif
+
+	if (wRemoveMsg == DVL_PM_NOREMOVE) {
+		// This does not actually fill out lpMsg, but this is ok
+		// since the engine never uses it in this case
+		return !message_queue.empty() || SDL_PollEvent(NULL);
+	}
+	if (wRemoveMsg != DVL_PM_REMOVE) {
+		UNIMPLEMENTED();
+	}
+
+	if (!message_queue.empty()) {
+		*lpMsg = message_queue.front();
+		message_queue.pop_front();
+		return true;
+	}
+
+	if (!SDL_PollEvent(&e)) {
+		return false;
+	}
+
+	if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT) && (!invflag && !spselflag && !chrflag && !stextflag && !questlog && !helpflag && !talkflag /* && !qtextflag*/)) {
+
+
+		if (e.type == SDL_FINGERDOWN) {
+
+			int Xclick = e.tfinger.x * 640;
+			int Yclick = e.tfinger.y * 480;
+			SDL_GetMouseState(&MouseX, &MouseY);
+			convert_touch_xy_to_game_xy(e.tfinger.x, e.tfinger.y, &MouseX, &MouseY);
+			SDL_Log(" TX %d, TY %d MX %d MY %d \n", Xclick, Yclick, TouchX, TouchY);
+		}
+
+		
+	}
+
+	lpMsg->hwnd = hWnd;
+	lpMsg->lParam = 0;
+	lpMsg->wParam = 0;
+
+	switch (e.type) {
+	case SDL_QUIT:
+		lpMsg->message = DVL_WM_QUIT;
+		break;
+	case SDL_KEYDOWN:
+	case SDL_KEYUP: {
+		int key = translate_sdl_key(e.key.keysym);
+		if (key == -1)
+			return false_avail();
+		lpMsg->message = e.type == SDL_KEYDOWN ? DVL_WM_KEYDOWN : DVL_WM_KEYUP;
+		lpMsg->wParam = (DWORD)key;
+		// HACK: Encode modifier in lParam for TranslateMessage later
+		lpMsg->lParam = e.key.keysym.mod << 16;
+	} break;
+	case SDL_MOUSEMOTION:
+		lpMsg->message = DVL_WM_MOUSEMOVE;
+		lpMsg->lParam = (e.motion.y << 16) | (e.motion.x & 0xFFFF);
+		lpMsg->wParam = keystate_for_mouse(0);
+		break;
+	case SDL_FINGERDOWN: {
+#ifdef ANDROID
+
+		int Xclick = e.tfinger.x * 640;
+		int Yclick = e.tfinger.y * 480;
+		SDL_Log("FINGER EVENTS\n");
+		int fingernum = SDL_GetNumTouchFingers(e.tfinger.touchId);
+
+		if (fingernum >= 2) {
+			if (invflag) {
+				UseInvItem(myplr, pcursinvitem);
+			} else {
+				//	SDL_Log("2 finger -- Right click --- X %d  Y %d \n",Xclick , Yclick );
+				lpMsg->message = DVL_WM_RBUTTONDOWN; // Not sure if this is needed...
+				lpMsg->lParam = (Yclick << 16) | (Xclick & 0xFFFF);
+				lpMsg->wParam = keystate_for_mouse(DVL_MK_RBUTTON);
+				checkMonstersNearby(true, true);
+			}
+		}
+
+		if (Xclick > Crect.x && Xclick < Crect.x + Crect.w && Yclick > Crect.y && Yclick < Crect.y + Crect.h) {
+			SDL_Log("Right click\n");
+			lpMsg->message = DVL_WM_RBUTTONDOWN;
+			lpMsg->lParam = (Yclick << 16) | (Xclick & 0xFFFF);
+			lpMsg->wParam = keystate_for_mouse(DVL_MK_RBUTTON);
+			checkMonstersNearby(true, true);
+		}
+		if (Xclick > 75 && Xclick < 100 && Yclick > 265 && Yclick < 295) {
+			if (!ShiftButtonPressed) {
+				SDL_Log("SHIFT PRESSED\n");
+				ShiftButtonPressed = 1;
+
+			} else {
+				SDL_Log("SHIFT UNPRESSED\n");
+				ShiftButtonPressed = 0;
+			}
+		}
+		if (!sbookflag && !invflag && !stextflag && Xclick > Arect.x && Xclick < Arect.x + Arect.w && Yclick > Arect.y && Yclick < Arect.y + Arect.h) {
+			AttackButtonPressed = true;
+
+			if (leveltype != DTYPE_TOWN) {
+				if (checkMonstersNearby(true, false) == false) { // Appears to works well.
+					ActivateObject(true);
+				}
+			} else {
+				checkTownersNearby(true);
+			}
+		}
+
+		if (Xclick > 108 && Xclick < 175 && Yclick > 400 && Yclick < 480) {
+			SDL_Log("Red Potion Used PRESSED\n");
+			useBeltPotion(false);
+		}
+		if (Xclick > 480 && Xclick < 530 && Yclick > 400 && Yclick < 480) {
+			SDL_Log("Blue Potion Used PRESSED\n");
+			useBeltPotion(true);
+		}
+		/*   */
+		if (invflag || spselflag || chrflag || stextflag || questlog || helpflag || talkflag || deathflag || sgpCurrentMenu || sbookflag || ShiftButtonPressed || pcurs != CURSOR_HAND || // If flags
+		    Xclick > LGameUIMenu.x   && Xclick < LGameUIMenu.x+LGameUIMenu.w     && Yclick > LGameUIMenu.y && Yclick < LGameUIMenu.y+LGameUIMenu.h  ||                                                                                                                           // OR if left panel click
+		    Xclick > RGameUIMenu.x   && Xclick < RGameUIMenu.x+RGameUIMenu.w     && Yclick > RGameUIMenu.y && Yclick < RGameUIMenu.y+RGameUIMenu.h ||                                                                                                                           // OR if right panel click
+		    Xclick > PotGameUIMenu.x && Xclick < PotGameUIMenu.x+PotGameUIMenu.w && Yclick > PotGameUIMenu.y && Yclick < PotGameUIMenu.y+PotGameUIMenu.h                                                                                                                        // OR if belt click
+
+		) {
+			if (ShiftButtonPressed && !invflag && !sbookflag && !chrflag) {
+				LeftMouseCmd(true);
+
+			} else {
+
+				SDL_Log("Left click\n");
+				lpMsg->message = DVL_WM_LBUTTONDOWN;
+				lpMsg->lParam = (Yclick << 16) | (Xclick & 0xFFFF);
+				lpMsg->wParam = keystate_for_mouse(DVL_MK_LBUTTON);
+			}
+		}
+
+	} break;
+#endif
+
+#ifndef ANDROID
+		int button = e.button.button;
+		if (button == SDL_BUTTON_LEFT) {
+			SDL_Log("BUTTON DOWN X %d  Y %d \n", e.button.x, e.button.y);
+			lpMsg->message = DVL_WM_LBUTTONDOWN;
+			lpMsg->lParam = (e.button.y << 16) | (e.button.x & 0xFFFF);
+			lpMsg->wParam = keystate_for_mouse(DVL_MK_LBUTTON);
+		} else if (button == SDL_BUTTON_RIGHT) {
+			lpMsg->message = DVL_WM_RBUTTONDOWN;
+			lpMsg->lParam = (e.button.y << 16) | (e.button.x & 0xFFFF);
+			lpMsg->wParam = keystate_for_mouse(DVL_MK_RBUTTON);
+		} else {
+			return false_avail();
+		}
+	}
+	break;
+
+#endif
+case SDL_FINGERUP: {
+	TouchX = 0;
+	TouchY = 0;
+	AttackButtonPressed = false;
+	CastButtonPressed = false;
+	SDL_Log("Finger UP!\n");
+	int Xclick = e.tfinger.x * 640;
+	int Yclick = e.tfinger.y * 480;
+	lpMsg->message = DVL_WM_LBUTTONUP;
+	lpMsg->lParam = (Yclick << 16) | (Xclick & 0xFFFF);
+	lpMsg->wParam = keystate_for_mouse(0);
+	lpMsg->message = DVL_WM_RBUTTONUP;
+	lpMsg->lParam = (Yclick << 16) | (Xclick & 0xFFFF);
+	lpMsg->wParam = keystate_for_mouse(DVL_MK_RBUTTON);
+	 SDL_PumpEvents();
+	SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
+} break;
+case SDL_MOUSEBUTTONUP: {
+	SDL_Log("MOUSE UP!\n");
+	int button = e.button.button;
+	if (button == SDL_BUTTON_LEFT) {
+		lpMsg->message = DVL_WM_LBUTTONUP;
+		lpMsg->lParam = (e.button.y << 16) | (e.button.x & 0xFFFF);
+		lpMsg->wParam = keystate_for_mouse(0);
+	} else if (button == SDL_BUTTON_RIGHT) {
+		lpMsg->message = DVL_WM_RBUTTONUP;
+		lpMsg->lParam = (e.button.y << 16) | (e.button.x & 0xFFFF);
+		lpMsg->wParam = keystate_for_mouse(0);
+		 SDL_PumpEvents();
+	SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
+	} else {
+		return false_avail();
+	}
+} break;
+case SDL_TEXTINPUT:
+case SDL_WINDOWEVENT:
+	if (e.window.event == SDL_WINDOWEVENT_CLOSE) {
+		lpMsg->message = DVL_WM_QUERYENDSESSION;
+	} else {
+		return false_avail();
+	}
+	break;
+default:
+	DUMMY_PRINT("unknown SDL message 0x%X", e.type);
+	return false_avail();
+}
+return true;
 }
 
+WINBOOL TranslateMessage(const MSG *lpMsg)
+{
+	assert(lpMsg->hwnd == 0);
+	if (lpMsg->message == DVL_WM_KEYDOWN) {
+		int key = lpMsg->wParam;
+		unsigned mod = (DWORD)lpMsg->lParam >> 16;
 
+		bool shift = (mod & KMOD_SHIFT) != 0;
+		bool upper = shift != (mod & KMOD_CAPS);
 
+		bool is_alpha = (key >= 'A' && key <= 'Z');
+		bool is_numeric = (key >= '0' && key <= '9');
+		bool is_control = key == DVL_VK_SPACE || key == DVL_VK_BACK || key == DVL_VK_ESCAPE || key == DVL_VK_TAB || key == DVL_VK_RETURN;
+		bool is_oem = (key >= DVL_VK_OEM_1 && key <= DVL_VK_OEM_7);
+
+		if (is_control || is_alpha || is_numeric || is_oem) {
+			if (!upper && is_alpha) {
+				key = tolower(key);
+			} else if (shift && is_numeric) {
+				key = key == '0' ? ')' : key - 0x10;
+			} else if (is_oem) {
+				// XXX: This probably only supports US keyboard layout
+				switch (key) {
+				case DVL_VK_OEM_1:
+					key = shift ? ':' : ';';
+					break;
+				case DVL_VK_OEM_2:
+					key = shift ? '?' : '/';
+					break;
+				case DVL_VK_OEM_3:
+					key = shift ? '~' : '`';
+					break;
+				case DVL_VK_OEM_4:
+					key = shift ? '{' : '[';
+					break;
+				case DVL_VK_OEM_5:
+					key = shift ? '|' : '\\';
+					break;
+				case DVL_VK_OEM_6:
+					key = shift ? '}' : ']';
+					break;
+				case DVL_VK_OEM_7:
+					key = shift ? '"' : '\'';
+					break;
+
+				case DVL_VK_OEM_MINUS:
+					key = shift ? '_' : '-';
+					break;
+				case DVL_VK_OEM_PLUS:
+					key = shift ? '+' : '=';
+					break;
+				case DVL_VK_OEM_PERIOD:
+					key = shift ? '>' : '.';
+					break;
+				case DVL_VK_OEM_COMMA:
+					key = shift ? '<' : ',';
+					break;
+
+				default:
+					UNIMPLEMENTED();
+				}
+			}
+
+			if (key >= 32) {
+				DUMMY_PRINT("char: %c", key);
+			}
+
+			// XXX: This does not add extended info to lParam
+			PostMessageA(lpMsg->hwnd, DVL_WM_CHAR, key, 0);
+		}
+	}
+
+	return true;
 }
 
+SHORT GetAsyncKeyState(int vKey)
+{
+	DUMMY_ONCE();
+	// TODO: Not handled yet.
+	return 0;
+}
 
+LRESULT DispatchMessageA(const MSG *lpMsg)
+{
+	DUMMY_ONCE();
+	assert(lpMsg->hwnd == 0);
+	assert(CurrentProc);
+	// assert(CurrentProc == GM_Game);
+
+	return CurrentProc(lpMsg->hwnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam);
+}
+
+WINBOOL PostMessageA(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+{
+	DUMMY();
+
+	assert(hWnd == 0);
+
+	MSG msg;
+	msg.hwnd = hWnd;
+	msg.message = Msg;
+	msg.wParam = wParam;
+	msg.lParam = lParam;
+
+	message_queue.push_back(msg);
+
+	return true;
+}
+}
