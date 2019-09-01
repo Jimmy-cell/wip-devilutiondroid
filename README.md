@@ -1,8 +1,10 @@
 # Compile
 
-Build the project in Android Studio
+1) Open and Build the project in Android Studio
 
+That is it!
 
+# Notes
 
 Notes : I commented out the .gitsubmodules because theupstream wasn't inline with the primary project.
 
