@@ -21,4 +21,6 @@ If you don't want to compile there is a [RELEASE](https://github.com/Jimmy-cell/
 
 YOU MUST OWN THE GAME INORDER FOR THIS TO WORK!
 
+# TODO
 
+This project should be refactored to build from a single folder and fit with [DevilutionX](https://github.com/diasurgical/devilutionX) 

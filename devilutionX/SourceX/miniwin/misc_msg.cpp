@@ -407,6 +407,9 @@ WINBOOL PeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilter
 		) {
 			if (ShiftButtonPressed) {
 				LeftMouseCmd(true);
+				if(invflag || chrflag || deathflag ){
+					ShiftButtonPressed = false;
+				}
 
 			} else {
 
