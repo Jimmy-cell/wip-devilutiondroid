@@ -14,9 +14,11 @@ When the game first runs it will copy the files from `/sdcard` to a created `/sd
 You can create these folders yourself or just exit the game and copy the needed files to them once the first initial run has taken place.
 
 # Play
-1) Copy  `androidimage` image content into `/sdcard/`.
+1) Copy images from `androidimage` into `/sdcard/`.
 2) Move `diabdat.mpq` (has to be lowercase name) to `/sdcard/`
 
+#if you don't want to compile
+[Install The Release ](https://github.com/Jimmy-cell/wip-devilutiondroid/blob/master/release/devilutionx.apk)
 
 To compile all you need to do is open the Android Studio and click the play button.
 
