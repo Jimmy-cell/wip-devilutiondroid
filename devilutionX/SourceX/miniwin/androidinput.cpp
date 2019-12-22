@@ -13,6 +13,8 @@ namespace dvl {
 	 SDL_Texture * JoyStickT;
 	 SDL_Surface * AJoyStickS;
 	 SDL_Texture * AJoyStickT;
+	 SDL_Surface * CJoyStickS;
+	 SDL_Texture * CJoyStickT;
 	 SDL_Surface * ShiftStickS;
 	 SDL_Texture * ShiftStickT;
 
@@ -25,30 +27,30 @@ namespace dvl {
 
 coords speedspellscoords[50];
 bool ShiftButtonPressed = 0;
-bool DemoModeEnabled=0;
+bool DemoModeEnabled=false;
 
  
  
- 
+ //x , y , w, h 
 SDL_Rect PotGameUIMenu ={195,350,245,50};
-SDL_Rect RGameUIMenu={555,350,85,130};
-SDL_Rect LGameUIMenu={0,350,85,130};
-SDL_Rect Arect={520,250,110,105};
-SDL_Rect Crect={565,180,60,60}; 
-SDL_Rect Shiftrect={68,257,58,52};
+SDL_Rect RGameUIMenu   ={555,350,85,130};
+SDL_Rect LGameUIMenu   ={0,350,85,130};
+SDL_Rect Arect         ={520,250,105,100};
+SDL_Rect Crect         ={565,180,70,60}; 
+SDL_Rect Shiftrect     ={68,257,57,52};
+SDL_Rect Jrect         ={1,200,190,170}; 
 
+//x , y , w, h 
+SDL_Rect DemoN ={68,202,57,52}; 
+SDL_Rect DemoE ={130,257,67,52};   
+SDL_Rect DemoW ={0,257,67,52};		
+SDL_Rect DemoS ={68,315,57,52};  
 
-
-SDL_Rect DemoN ={68,202,58,52}; 
-SDL_Rect DemoE ={140,257,58,52};   
-SDL_Rect DemoW ={0,257,58,52};		
-SDL_Rect DemoS ={68,315,58,52};  
-
-
-SDL_Rect DemoNW={0,204,58,52};
-SDL_Rect DemoNE={140,204,58,52};	
-SDL_Rect DemoSW={0,315,58,52};
-SDL_Rect DemoSE={140,315,58,52};
+//x , y , w, h 
+SDL_Rect DemoNW={0,204,67,52};
+SDL_Rect DemoNE={130,204,67,52};	
+SDL_Rect DemoSW={0,315,67,52};
+SDL_Rect DemoSE={130,315,67,52};
 
 
 SDL_Rect DemonHealth={100,350,85,130};
@@ -73,26 +75,32 @@ bool DemoMode = false;
 
 	//https://image.flaticon.com/icons/png/512/54/54528.png
 	//Loading Attack buttons
-	 AJoyStickS = IMG_Load("/sdcard/Android/data/org.diasurgical.devilutionx/input_attack.png");
+	 AJoyStickS = IMG_Load("/sdcard/devilutionx/input_attack.png");
      AJoyStickT = SDL_CreateTextureFromSurface(renderer, AJoyStickS);
 	 SDL_SetTextureBlendMode(AJoyStickT, SDL_BLENDMODE_BLEND);
 	 SDL_SetTextureAlphaMod(AJoyStickT, 150);
+
+	 //Load CastButtons.
+	 CJoyStickS = IMG_Load("/sdcard/devilutionx/input_cast.png");
+     CJoyStickT = SDL_CreateTextureFromSurface(renderer, CJoyStickS);
+	 SDL_SetTextureBlendMode(CJoyStickT, SDL_BLENDMODE_BLEND);
+	 SDL_SetTextureAlphaMod(CJoyStickT, 150);
 	 
 	 //https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Crossed_circle.svg/1200px-Crossed_circle.svg.png
-	 ShiftStickS = IMG_Load("/sdcard/Android/data/org.diasurgical.devilutionx/shift.png");
+	 ShiftStickS = IMG_Load("/sdcard/devilutionx/shift.png");
      ShiftStickT = SDL_CreateTextureFromSurface(renderer, ShiftStickS);
 	 SDL_SetTextureBlendMode(ShiftStickT, SDL_BLENDMODE_BLEND);
 	 SDL_SetTextureAlphaMod(ShiftStickT, 255);
 
 
 	 //Loading Walking Joystick.
-	 JoyStickS = IMG_Load("/sdcard/Android/data/org.diasurgical.devilutionx/dpad.png");
+	 JoyStickS = IMG_Load("/sdcard/devilutionx/dpad.png");
      JoyStickT = SDL_CreateTextureFromSurface(renderer, JoyStickS);
 	 SDL_SetTextureBlendMode(JoyStickT, SDL_BLENDMODE_BLEND);
-	 SDL_SetTextureAlphaMod(JoyStickT, 175);
+	 SDL_SetTextureAlphaMod(JoyStickT, 75);
 
 
-	DemoSqS = IMG_Load("/sdcard/Android/data/org.diasurgical.devilutionx/demosq.png");
+	DemoSqS = IMG_Load("/sdcard/devilutionx/demosq.png");
 	DemoSqT = SDL_CreateTextureFromSurface(renderer, DemoSqS);
 	SDL_SetTextureBlendMode(DemoSqT, SDL_BLENDMODE_BLEND);
 	SDL_SetTextureAlphaMod(DemoSqT, 255);
@@ -114,16 +122,15 @@ void HideCursor()
 
 void DrawJoyStick(int MouseX, int MouseY, bool flag){
 
-		 SDL_Rect Jrect;
-         Jrect.x = 1; // I want this to be dynamic
-         Jrect.y = 200;
-         Jrect.h = 170;
-         Jrect.w = 190; 
+
 
 		 //TX 181, TY 309 MX 181 MY 309
 	SDL_RenderCopy(renderer, JoyStickT, NULL, &Jrect);
 	if(DemoModeEnabled){
 	
+
+
+	//Dpad
 	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoE);
 	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoW); 
 	SDL_RenderCopy(renderer, DemoSqT, NULL, &DemoS);
@@ -213,16 +220,24 @@ void DrawAndroidUI(){
 			else{
 				SDL_SetTextureColorMod(ShiftStickT, 255, 0, 0);
 				SDL_RenderCopy(renderer, AJoyStickT, NULL, &Arect);
+				if (DemoModeEnabled){
+					    // attack
+						SDL_RenderCopy(renderer, DemoSqT, NULL, &Arect);
+				}
 			}
 
 
 			if(CastButtonPressed){
 				SDL_SetTextureColorMod(ShiftStickT, 255, 0, 0);
-				SDL_RenderCopy(renderer, AJoyStickT, NULL, &Crect);
+				SDL_RenderCopy(renderer, CJoyStickT, NULL, &Crect);
 
 			}
 			else{
-				SDL_RenderCopy(renderer, AJoyStickT, NULL, &Crect);
+				SDL_RenderCopy(renderer, CJoyStickT, NULL, &Crect);
+				if (DemoModeEnabled){
+					    // attack
+						SDL_RenderCopy(renderer, DemoSqT, NULL, &Crect);
+				}
 				
 			}
 
