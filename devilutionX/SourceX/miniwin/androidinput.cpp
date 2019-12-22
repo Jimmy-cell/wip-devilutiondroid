@@ -35,10 +35,10 @@ bool DemoModeEnabled=false;
 SDL_Rect PotGameUIMenu ={195,350,245,50};
 SDL_Rect RGameUIMenu   ={555,350,85,130};
 SDL_Rect LGameUIMenu   ={0,350,85,130};
-SDL_Rect Arect         ={520,250,105,100};
-SDL_Rect Crect         ={565,180,70,60}; 
-SDL_Rect Shiftrect     ={68,257,57,52};
-SDL_Rect Jrect         ={1,200,190,170}; 
+SDL_Rect Arect         ={520,250,100,95};
+SDL_Rect Crect         ={560,180,90,80};
+SDL_Rect Shiftrect     ={58,257,57,52};
+SDL_Rect Jrect         ={1,200,170,170};
 
 //x , y , w, h 
 SDL_Rect DemoN ={68,202,57,52}; 

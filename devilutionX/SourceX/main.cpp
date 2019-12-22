@@ -44,7 +44,7 @@ int SDL_main(int argc, char* argv[]) {
 
 
 //This *CAN* be better. I understand.
-if ( FileExists("/sdcard/devilutionx") == False) {
+if ( FileExists("/sdcard/devilutionx") == false) {
 	const int dir_errz = system("mkdir -p /sdcard/devilutionx");
 	if (-1 == dir_errz) {
 		printf("Error creating directory!\n");
@@ -53,7 +53,7 @@ if ( FileExists("/sdcard/devilutionx") == False) {
 }
 
 // Copy images if they exist --
-if ( FileExists("/sdcard/devilutionx/dpad.png") == False) {
+if ( FileExists("/sdcard/devilutionx/dpad.png") == false) {
 	const int dir_errx = system("cp  /sdcard/dpad.png /sdcard/devilutionx/");
 	if (-1 == dir_errx) {
 		printf("Error copying dpad.png !\n");
@@ -61,21 +61,21 @@ if ( FileExists("/sdcard/devilutionx/dpad.png") == False) {
 	}
 }
 
-if ( FileExists("/sdcard/devilutionx/shift.png") == False) {
+if ( FileExists("/sdcard/devilutionx/shift.png") == false) {
 	const int dir_errc = system("cp  /sdcard/shift.png /sdcard/devilutionx/");
 	if (-1 == dir_errc) {
 		printf("Error copying shift.png\n");
 		exit(1);
 	}
 }
-if ( FileExists("/sdcard/devilutionx/demosq.png") == False) {
+if ( FileExists("/sdcard/devilutionx/demosq.png") == false) {
 	const int dir_errv = system("cp  /sdcard/demosq.png /sdcard/devilutionx/");
 	if (-1 == dir_errv) {
 		printf("Error copying demosq.png\n");
 		exit(1);
 	}
 }
-if ( FileExists("/sdcard/devilutionx/input_attack.png") == False) {
+if ( FileExists("/sdcard/devilutionx/input_attack.png") == false) {
 	const int dir_errb = system("cp  /sdcard/input_attack.png /sdcard/devilutionx/");
 	if (-1 == dir_errb) {
 		printf("Error copying input_attack.png\n");
@@ -83,7 +83,7 @@ if ( FileExists("/sdcard/devilutionx/input_attack.png") == False) {
 	}
 }
 
-if ( FileExists("/sdcard/devilutionx/input_cast.png/") == False) {
+if ( FileExists("/sdcard/devilutionx/input_cast.png/") == false) {
 	const int dir_errcc = system("cp  /sdcard/input_cast.png /sdcard/devilutionx/");
 	if (-1 == dir_errcc) {
 		printf("Error copying input_attack.png\n");
@@ -91,7 +91,7 @@ if ( FileExists("/sdcard/devilutionx/input_cast.png/") == False) {
 	}
 }
 
-if ( FileExists("/sdcard/devilutionx/diabdat.mpq") == False) {
+if ( FileExists("/sdcard/devilutionx/diabdat.mpq") == false) {
 	const int dir_errbz = system("cp  /sdcard/diabdat.mpq /sdcard/devilutionx/");
 	if (-1 == dir_errbz) {
 		printf("Error copying diabdat.mpq \n");
@@ -100,7 +100,7 @@ if ( FileExists("/sdcard/devilutionx/diabdat.mpq") == False) {
 }
 
 //org.diasurgical.devilutionx
-if ( FileExists("/sdcard/Android/data/org.diasurgical.devilutionx") == False) {
+if ( FileExists("/sdcard/Android/data/org.diasurgical.devilutionx") == false) {
 	const int dir_errn = system("mkdir -p /sdcard/Android/data/org.diasurgical.devilutionx");
 	if (-1 == dir_errn) {
 		printf("Error creating directory!\n");

@@ -10,7 +10,7 @@ Status | Platform
 ![Discord Channel](https://avatars3.githubusercontent.com/u/1965106?s=16&v=4) [Discord Chat Channel](https://discord.gg/aQBQdDe)
 
 # How To Play:
- - Copy diabdat.mpq from your CD, or GoG install folder, to the DevilutionX game directory ; Make sure it is all lowercase.
+ - Copy diabdat.mpq from your CD, or GoG install folder, to your /sdcard/  ; Make sure it is all lowercase.
  - [Download DevilutionX](https://github.com/diasurgical/devilutionX/releases), or build from source
  - Install SDL2 (including SDL2_mixer and SDL2_ttf) make sure to get the appropriate 32bit or 64bit version.
  - Run `./devilutionx`
